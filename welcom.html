@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnonSpace - مرحباً بك في مساحتك المجهولة</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font: Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #0b0f17;
+            overflow-x: hidden;
+        }
+
+      
+        .bg-grid-pattern {
+            background-image: radial-gradient(rgba(16, 185, 129, 0.12) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        
+        @keyframes blob {
+            0%, 100% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        .animate-blob {
+            animation: blob 8s infinite ease-in-out;
+        }
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
+
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.03); }
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+
+       
+        .btn-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-shine::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                60deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.25) 50%,
+                transparent 70%
+            );
+            transform: rotate(30deg) translateX(-100%);
+            transition: transform 0.8s ease-in-out;
+        }
+        .btn-shine:hover::after {
+            transform: rotate(30deg) translateX(100%);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center relative bg-grid-pattern selection:bg-emerald-500 selection:text-black">
+
+
+    <div class="fixed top-1/4 -right-20 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl animate-blob pointer-events-none"></div>
+    <div class="fixed bottom-1/4 -left-20 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl animate-blob animation-delay-2000 pointer-events-none"></div>
+    <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-900/10 rounded-full blur-3xl animate-blob animation-delay-4000 pointer-events-none"></div>
+
+   
+    <main class="relative z-10 max-w-2xl w-full mx-4 my-8 p-8 sm:p-12 rounded-3xl bg-[#121824]/70 border border-gray-800/80 backdrop-blur-xl shadow-2xl text-center space-y-8">
+        
+        
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold tracking-wide shadow-inner">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>مساحتك الآمنة والحرّة</span>
+        </div>
+
+        
+        <div class="space-y-4">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 text-black shadow-lg shadow-emerald-500/20 transform hover:rotate-6 transition duration-300">
+                <i class="fa-solid fa-user-secret text-4xl"></i>
+            </div>
+            
+            <h1 class="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+                أهلاً بك في <span class="bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-200 bg-clip-text text-transparent">AnonSpace</span>
+            </h1>
+            
+            <p class="text-gray-400 text-sm sm:text-base leading-relaxed max-w-lg mx-auto">
+                منصة مجهولة بالكامل تتيح لك التعبير عن مشاعرك، أسرارك، نصائحك وتساؤلاتك بدون حساب وبكل حرية وخصوصية.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 pt-2 text-xs">
+            <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800/80 text-gray-300 flex flex-col items-center gap-1.5 hover:border-emerald-500/40 transition">
+                <i class="fa-solid fa-shield-halved text-emerald-400 text-lg"></i>
+                <span class="font-semibold">هوية مجهولة</span>
+            </div>
+            <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800/80 text-gray-300 flex flex-col items-center gap-1.5 hover:border-emerald-500/40 transition">
+                <i class="fa-solid fa-bolt text-emerald-400 text-lg"></i>
+                <span class="font-semibold">بدون تسجيل</span>
+            </div>
+            <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800/80 text-gray-300 flex flex-col items-center gap-1.5 hover:border-emerald-500/40 transition">
+                <i class="fa-solid fa-comments text-emerald-400 text-lg"></i>
+                <span class="font-semibold">تفاعل حقيقي</span>
+            </div>
+        </div>
+
+       
+        <div class="pt-4 relative group inline-block w-full sm:w-auto">
+           
+            <div class="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-teal-400 rounded-2xl blur-lg opacity-70 group-hover:opacity-100 transition duration-500 animate-pulse-glow"></div>
+            
+            
+            <a href="index.html" class="btn-shine relative w-full sm:w-auto inline-flex items-center justify-center gap-3 px-10 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 text-black font-extrabold text-base sm:text-lg shadow-xl transform group-hover:-translate-y-1 transition-all duration-300 active:translate-y-0">
+                <span>ادخل للمنصة الآن</span>
+                <i class="fa-solid fa-arrow-left transition-transform duration-300 group-hover:-translate-x-2"></i>
+            </a>
+        </div>
+
+        
+        <div class="pt-2">
+            <a href="about.html" class="text-xs text-gray-500 hover:text-emerald-400 transition flex items-center justify-center gap-1">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>تعرف أكثر على المنصة وقواعد الاستخدام</span>
+            </a>
+        </div>
+
+    </main>
+
+</body>
+</html>
+
