@@ -1,4 +1,3 @@
-
 let userToken = localStorage.getItem('anon_user_token');
 if (!userToken) {
     userToken = 'token_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
@@ -36,7 +35,6 @@ function filterCategory(category, btnElement) {
 
     fetchPosts();
 }
-
 
 function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
@@ -80,21 +78,18 @@ function removeSelectedImage() {
     if (container) container.classList.add('hidden');
 }
 
-
 async function fetchPosts() {
     const container = document.getElementById('posts-container');
     if (!container) return;
 
     try {
- 
-        const client = window.db || (typeof db !== 'undefined' ? db : null);
+        const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
         if (!client) {
             console.error('لم يتم العثور على كائن الاتصال بقاعدة البيانات db');
             container.innerHTML = `<div class="text-center py-12 text-red-400 text-xs">خطأ في الاتصال بقاعدة البيانات. تأكد من إعدادات Supabase.</div>`;
             return;
         }
 
-  
         let query = client
             .from('posts')
             .select('*')
@@ -177,10 +172,8 @@ function renderPostCard(post) {
     `;
 }
 
-
-
 async function submitPost() {
-    const client = window.db || (typeof db !== 'undefined' ? db : null);
+    const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
     const contentInput = document.getElementById('post-content');
     const categoryInput = document.getElementById('post-category');
     const submitBtn = document.getElementById('submit-btn');
@@ -250,7 +243,7 @@ async function submitPost() {
 }
 
 async function reactPost(postId, type) {
-    const client = window.db || (typeof db !== 'undefined' ? db : null);
+    const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
     if (localStorage.getItem(`reacted_${postId}`)) {
         return showToast('لقد تفاعلت مع هذه المشاركة سابقاً', 'error');
     }
@@ -267,8 +260,16 @@ async function reactPost(postId, type) {
         const { error: updateErr } = await client.from('posts').update(updateObj).eq('id', postId);
         if (updateErr) throw updateErr;
 
+        await client.from('notifications').insert([
+            { 
+                post_id: postId, 
+                message: 'تفاعل أحد الزوار مع بوحك الخفي!' 
+            }
+        ]);
+
         localStorage.setItem(`reacted_${postId}`, type);
         showToast(type === 'like' ? 'تم تسجيل إعجابك' : 'تم تسجيل عدم إعجابك', 'success');
+        checkUnreadNotifications();
         fetchPosts();
     } catch (err) {
         console.error(err);
@@ -277,7 +278,7 @@ async function reactPost(postId, type) {
 }
 
 async function deletePost(postId) {
-    const client = window.db || (typeof db !== 'undefined' ? db : null);
+    const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
     if (!confirm('هل أنت متأكد من إرادة حذف هذه المشاركة؟')) return;
 
     try {
@@ -292,7 +293,7 @@ async function deletePost(postId) {
 }
 
 async function reportPost(postId) {
-    const client = window.db || (typeof db !== 'undefined' ? db : null);
+    const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
     if (localStorage.getItem(`reported_${postId}`)) {
         return showToast('لقد قمت بالإبلاغ عن هذا المنشور سابقاً', 'error');
     }
@@ -316,9 +317,8 @@ async function reportPost(postId) {
     }
 }
 
-
 function initRealtimeNotifications() {
-    const client = window.db || (typeof db !== 'undefined' ? db : null);
+    const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
     if (!client) return;
 
     client.channel('my-comments-notifications')
@@ -346,10 +346,101 @@ function initRealtimeNotifications() {
             }
         })
         .subscribe();
-}
 
+    client.channel('db-notifications')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, () => {
+            checkUnreadNotifications();
+            const dropdown = document.getElementById('notif-dropdown');
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                loadNotifications();
+            }
+        })
+        .subscribe();
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchPosts();
     initRealtimeNotifications();
+    checkUnreadNotifications();
 });
+
+function toggleNotifications() {
+    const dropdown = document.getElementById('notif-dropdown');
+    dropdown.classList.toggle('hidden');
+    
+    if (!dropdown.classList.contains('hidden')) {
+        loadNotifications();
+    }
+}
+
+document.addEventListener('click', function(event) {
+    const btn = document.getElementById('notif-btn');
+    const dropdown = document.getElementById('notif-dropdown');
+    if (btn && dropdown && !btn.contains(event.target) && !dropdown.contains(event.target)) {
+        dropdown.classList.add('hidden');
+    }
+});
+
+async function loadNotifications() {
+    const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
+    const listContainer = document.getElementById('notif-list');
+    if (!listContainer || !client) return;
+    
+    const { data: notifications, error } = await client
+        .from('notifications')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+    if (error || !notifications || notifications.length === 0) {
+        listContainer.innerHTML = `<div class="p-4 text-center text-xs text-gray-500">لا توجد إشعارات حالياً</div>`;
+        return;
+    }
+
+    listContainer.innerHTML = notifications.map(n => `
+        <div class="p-3 hover:bg-gray-800/40 transition flex items-start gap-3 ${!n.is_read ? 'bg-emerald-950/20' : ''}">
+            <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                <i class="fa-solid fa-heart text-xs"></i>
+            </div>
+            <div class="flex-1 text-right">
+                <p class="text-xs text-gray-200">${n.message}</p>
+                <span class="text-[10px] text-gray-500">${new Date(n.created_at).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function checkUnreadNotifications() {
+    const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
+    if (!client) return;
+
+    const { count, error } = await client
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_read', false);
+
+    const badge = document.getElementById('notif-badge');
+    if (badge) {
+        if (!error && count > 0) {
+            badge.innerText = count > 9 ? '+9' : count;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    }
+}
+
+async function markAllAsRead() {
+    const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
+    if (!client) return;
+
+    await client
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('is_read', false);
+
+    const badge = document.getElementById('notif-badge');
+    if (badge) badge.classList.add('hidden');
+    loadNotifications();
+}
+

@@ -82,6 +82,34 @@
                 <span>عن المنصة</span>
             </a>
         </div>
+
+        
+<div class="relative">
+    
+    <button id="notif-btn" onclick="toggleNotifications()" class="relative p-2 text-gray-300 hover:text-emerald-400 transition rounded-xl bg-gray-900/60 hover:bg-gray-800/80 border border-gray-800 flex items-center justify-center">
+        <i class="fa-solid fa-bell text-base"></i>
+        
+
+        <span id="notif-badge" class="hidden absolute -top-1 -right-1 bg-emerald-500 text-black text-[10px] font-black rounded-full h-4 w-4 flex items-center justify-center shadow-md shadow-emerald-500/50">
+            0
+        </span>
+    </button>
+
+    
+    <div id="notif-dropdown" class="hidden absolute left-0 mt-3 w-80 glass-card rounded-2xl shadow-2xl border border-gray-800 z-50 overflow-hidden">
+        <div class="p-3 border-b border-gray-800/80 flex items-center justify-between bg-gray-900/40">
+            <span class="font-bold text-xs text-white flex items-center gap-2">
+                <i class="fa-solid fa-bell text-emerald-400"></i> الإشعارات
+            </span>
+            <button onclick="markAllAsRead()" class="text-[11px] text-emerald-400 hover:underline">تحديد الكل كمعاين</button>
+        </div>
+
+        
+        <div id="notif-list" class="max-h-72 overflow-y-auto divide-y divide-gray-800/40">
+            <div class="p-4 text-center text-xs text-gray-500">لا توجد إشعارات جديدة</div>
+        </div>
+    </div>
+</div>
     </header>
 
     

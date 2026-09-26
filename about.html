@@ -60,7 +60,6 @@
     <div class="fixed top-1/4 -right-20 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl animate-blob pointer-events-none"></div>
     <div class="fixed bottom-1/4 -left-20 w-96 h-96 bg-teal-500/15 rounded-full blur-3xl animate-blob animation-delay-2000 pointer-events-none"></div>
 
-    <!-- Header -->
     <header class="sticky top-0 z-40 glass-card border-b border-gray-800/80">
         <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2 font-black text-xl text-white">
@@ -74,7 +73,6 @@
         </div>
     </header>
 
-  
     <main class="max-w-3xl mx-auto px-4 py-10 space-y-10 flex-1 relative z-10">
         
         <div class="text-center space-y-4">
@@ -141,6 +139,27 @@
             </ul>
         </div>
 
+        <div class="glass-card p-6 rounded-2xl space-y-4">
+            <h2 class="font-bold text-white text-base text-center">قيم تجربتك للموقع</h2>
+
+            <div class="flex justify-center gap-2 text-2xl text-gray-600 cursor-pointer" id="star-rating">
+                <i class="fa-solid fa-star star transition-colors" data-value="1"></i>
+                <i class="fa-solid fa-star star transition-colors" data-value="2"></i>
+                <i class="fa-solid fa-star star transition-colors" data-value="3"></i>
+                <i class="fa-solid fa-star star transition-colors" data-value="4"></i>
+                <i class="fa-solid fa-star star transition-colors" data-value="5"></i>
+            </div>
+
+            <textarea id="feedback-input" rows="3" placeholder="اكتب ملاحظاتك أو اقتراحاتك هنا (اختياري)..." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs text-white focus:border-emerald-500 outline-none resize-none"></textarea>
+
+            <button onclick="submitRating()" class="w-full py-2.5 bg-emerald-500 text-black font-bold text-xs rounded-xl hover:bg-emerald-400 transition">إرسال التقييم</button>
+            
+            <div class="text-center pt-2 border-t border-gray-800/60 mt-4">
+                <span class="text-xs text-gray-400 block">متوسط التقييم العام</span>
+                <div class="text-xl font-bold text-amber-400 mt-1" id="average-rating">-- / 5</div>
+            </div>
+        </div>
+
         <div class="text-center pt-2">
             <a href="index.html" class="btn-shine inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold px-8 py-3.5 rounded-2xl text-sm transition shadow-xl shadow-emerald-500/20">
                 <i class="fa-solid fa-pen-to-square"></i>
@@ -155,5 +174,93 @@
         <p>مطور المنصة <strong>الحسين العلي </strong></p>
     </footer>
 
+    <script src="supabase.js"></script>
+    <script>
+        let selectedRating = 0;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupStars();
+            loadAverageRating();
+        });
+
+        function setupStars() {
+            const stars = document.querySelectorAll('#star-rating .star');
+            
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    selectedRating = parseInt(star.getAttribute('data-value'));
+                    updateStarsUI(selectedRating);
+                });
+
+                star.addEventListener('mouseover', () => {
+                    const hoverValue = parseInt(star.getAttribute('data-value'));
+                    updateStarsUI(hoverValue);
+                });
+
+                star.addEventListener('mouseleave', () => {
+                    updateStarsUI(selectedRating);
+                });
+            });
+        }
+
+        function updateStarsUI(rating) {
+            const stars = document.querySelectorAll('#star-rating .star');
+            stars.forEach(star => {
+                const val = parseInt(star.getAttribute('data-value'));
+                if (val <= rating) {
+                    star.classList.add('text-amber-400');
+                    star.classList.remove('text-gray-600');
+                } else {
+                    star.classList.remove('text-amber-400');
+                    star.classList.add('text-gray-600');
+                }
+            });
+        }
+
+        async function submitRating() {
+            if (selectedRating === 0) {
+                alert('يرجى تحديد عدد النجوم قبل الإرسال');
+                return;
+            }
+
+            const feedback = document.getElementById('feedback-input').value.trim();
+
+            try {
+                const { error } = await db.from('site_ratings').insert([
+                    { rating: selectedRating, feedback: feedback }
+                ]);
+
+                if (error) throw error;
+
+                alert('شكراً لك! تم إرسال تقييمك بنجاح.');
+                document.getElementById('feedback-input').value = '';
+                selectedRating = 0;
+                updateStarsUI(0);
+                loadAverageRating();
+
+            } catch (err) {
+                console.error('Error submitting rating:', err);
+                alert('حدث خطأ أثناء إرسال التقييم');
+            }
+        }
+
+        async function loadAverageRating() {
+            try {
+                const { data, error } = await db.from('site_ratings').select('rating');
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    const sum = data.reduce((acc, curr) => acc + curr.rating, 0);
+                    const avg = (sum / data.length).toFixed(1);
+                    document.getElementById('average-rating').innerText = `⭐ ${avg} / 5`;
+                } else {
+                    document.getElementById('average-rating').innerText = 'لا توجد تقييمات بعد';
+                }
+            } catch (err) {
+                console.error('Error loading average rating:', err);
+            }
+        }
+    </script>
+    <script src="js/supabase-config.js"></script>
 </body>
 </html>

@@ -11,7 +11,6 @@ function getOrGenerateBadge() {
     return badge;
 }
 
-
 async function loadPostDetails() {
     if (!currentPostId) {
         window.location.href = 'index.html';
@@ -66,66 +65,159 @@ async function loadPostDetails() {
     `;
 }
 
-
 async function loadComments() {
+    if (!currentPostId) return;
+
     const container = document.getElementById('comments-container');
-    container.innerHTML = '<div class="text-center text-gray-500 py-4 text-xs">جاري تحميل التعليقات...</div>';
+    if (!container) return;
 
-    const { data: comments, error } = await db
-        .from('comments')
-        .select('*')
-        .eq('post_id', currentPostId)
-        .order('created_at', { ascending: true });
+    try {
+        const { data: allComments, error } = await db
+            .from('comments')
+            .select('*')
+            .eq('post_id', currentPostId);
 
-    if (error) {
-        container.innerHTML = '<div class="text-center text-rose-500 py-2 text-xs">خطأ في جلب التعليقات.</div>';
-        return;
+        if (error) throw error;
+
+        if (!allComments || allComments.length === 0) {
+            container.innerHTML = `<div class="text-center py-6 text-gray-500 text-xs">لا توجد تعليقات بعد.</div>`;
+            return;
+        }
+
+        allComments.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+        const mainComments = allComments.filter(c => !c.parent_id);
+        const replies = allComments.filter(c => c.parent_id);
+
+        container.innerHTML = mainComments.map(comment => {
+            const commentReplies = replies.filter(r => r.parent_id === comment.id);
+            return renderCommentCard(comment, commentReplies, currentPostId);
+        }).join('');
+
+    } catch (err) {
+        console.error('Error loading comments:', err);
+        container.innerHTML = `<div class="text-center py-6 text-red-400 text-xs">تعذر تحميل التعليقات.</div>`;
     }
-
-    if (comments.length === 0) {
-        container.innerHTML = '<div class="text-center text-gray-500 py-6 text-xs">لا توجد تعليقات بعد، كن أول المعلقين!</div>';
-        return;
-    }
-
-    container.innerHTML = comments.map(comment => `
-        <div class="bg-gray-900/60 rounded-xl p-3 border border-gray-800/80 space-y-1.5">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-accent">${comment.user_badge}</span>
-                <span class="text-[10px] text-gray-500">${new Date(comment.created_at).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</span>
-            </div>
-            <p class="text-xs text-gray-300 leading-relaxed">${comment.content}</p>
-        </div>
-    `).join('');
 }
 
 async function submitComment() {
+    if (!currentPostId) return;
+
     const input = document.getElementById('comment-input');
+    if (!input) return;
+
     const content = input.value.trim();
     if (!content) return alert('يرجى كتابة نص التعليق أولاً');
 
     const badge = getOrGenerateBadge();
 
-    const { error: commentError } = await db.from('comments').insert([
-        { post_id: currentPostId, content: content, user_badge: badge }
-    ]);
+    try {
+        const { error: commentError } = await db.from('comments').insert([
+            { post_id: currentPostId, content: content, user_badge: badge, parent_id: null }
+        ]);
 
-    if (commentError) {
+        if (commentError) throw commentError;
+
+        const { data: post } = await db.from('posts').select('comments_count').eq('id', currentPostId).single();
+        await db.from('posts').update({ comments_count: (post?.comments_count || 0) + 1 }).eq('id', currentPostId);
+
+        input.value = '';
+        loadComments();
+        loadPostDetails();
+
+    } catch (err) {
+        console.error('Error submitting comment:', err);
         alert('حدث خطأ أثناء إضافة التعليق');
-        return;
     }
+}
 
-    const { data: post } = await db.from('posts').select('comments_count').eq('id', currentPostId).single();
-    await db.from('posts').update({ comments_count: (post?.comments_count || 0) + 1 }).eq('id', currentPostId);
+async function submitReply(postId, parentCommentId) {
+    const inputElement = document.getElementById(`reply-input-${parentCommentId}`);
+    if (!inputElement) return;
 
-    input.value = '';
-    loadComments();
-    loadPostDetails();
+    const content = inputElement.value.trim();
+    if (!content) return alert('يرجى كتابة نص الرد أولاً');
+
+    const badge = getOrGenerateBadge();
+
+    try {
+        const { error } = await db.from('comments').insert([
+            {
+                post_id: postId,
+                parent_id: parentCommentId,
+                content: content,
+                user_badge: badge
+            }
+        ]);
+
+        if (error) throw error;
+
+        const { data: post } = await db.from('posts').select('comments_count').eq('id', postId).single();
+        await db.from('posts').update({ comments_count: (post?.comments_count || 0) + 1 }).eq('id', postId);
+
+        inputElement.value = '';
+        toggleReplyForm(parentCommentId);
+        loadComments();
+        loadPostDetails();
+
+    } catch (err) {
+        console.error('Error submitting reply:', err);
+        alert('حدث خطأ أثناء إرسال الرد');
+    }
+}
+
+function renderCommentCard(comment, replies = [], postId) {
+    return `
+        <div class="bg-gray-900/60 border border-gray-800/80 rounded-xl p-3 space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-accent">${comment.user_badge}</span>
+                <span class="text-[10px] text-gray-500">${new Date(comment.created_at).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</span>
+            </div>
+
+            <p class="text-xs text-gray-300 leading-relaxed">${comment.content}</p>
+
+            <div class="flex items-center gap-2 pt-1">
+                <button onclick="toggleReplyForm('${comment.id}')" class="text-[11px] text-emerald-400 hover:underline flex items-center gap-1">
+                    <i class="fa-solid fa-reply text-[10px]"></i>
+                    <span>رد (${replies.length})</span>
+                </button>
+            </div>
+
+            <div id="reply-form-${comment.id}" class="hidden pt-2 border-t border-gray-800/50 space-y-2">
+                <textarea id="reply-input-${comment.id}" rows="2" placeholder="اكتب ردك هنا..." class="w-full bg-gray-950/80 border border-gray-800 rounded-lg p-2 text-xs text-white focus:border-emerald-500 outline-none resize-none"></textarea>
+                <div class="flex justify-end gap-2">
+                    <button onclick="toggleReplyForm('${comment.id}')" class="px-3 py-1 rounded-md text-[10px] bg-gray-800 text-gray-400">إلغاء</button>
+                    <button onclick="submitReply('${postId}', '${comment.id}')" class="px-3 py-1 rounded-md text-[10px] bg-emerald-500 text-black font-bold">إرسال الرد</button>
+                </div>
+            </div>
+
+            ${replies.length > 0 ? `
+                <div class="mr-3 pr-2 border-r-2 border-emerald-500/30 space-y-2 mt-2">
+                    ${replies.map(reply => `
+                        <div class="bg-gray-950/50 p-2.5 rounded-lg border border-gray-800/40 space-y-1">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-semibold text-accent/80">${reply.user_badge}</span>
+                                <span class="text-[9px] text-gray-500">${new Date(reply.created_at).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</span>
+                            </div>
+                            <p class="text-xs text-gray-300">${reply.content}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+function toggleReplyForm(commentId) {
+    const form = document.getElementById(`reply-form-${commentId}`);
+    if (form) {
+        form.classList.toggle('hidden');
+    }
 }
 
 function openPostDetails(postId) {
     window.location.href = `post.html?id=${postId}`;
 }
-
 
 document.addEventListener('DOMContentLoaded', () => {
     loadPostDetails();
