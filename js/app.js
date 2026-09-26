@@ -19,6 +19,40 @@ function getMyPostIds() {
 let selectedImageFile = null;
 let currentCategory = 'الكل';
 
+function formatWesternNumber(num) {
+    const arabicNums = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    return String(num).replace(/[٠-٩]/g, d => arabicNums.indexOf(d));
+}
+
+function formatTimeAgo(dateString) {
+    if (!dateString) return '';
+    const now = new Date();
+    const past = new Date(dateString);
+    const seconds = Math.floor((now - past) / 1000);
+
+    let interval = seconds / 31536000;
+    if (interval > 1) {
+        return `منذ ${formatWesternNumber(Math.floor(interval))} سنة`;
+    }
+    interval = seconds / 2592000;
+    if (interval > 1) {
+        return `منذ ${formatWesternNumber(Math.floor(interval))} شهر`;
+    }
+    interval = seconds / 86400;
+    if (interval > 1) {
+        return `منذ ${formatWesternNumber(Math.floor(interval))} يوم`;
+    }
+    interval = seconds / 3600;
+    if (interval > 1) {
+        return `منذ ${formatWesternNumber(Math.floor(interval))} ساعة`;
+    }
+    interval = seconds / 60;
+    if (interval > 1) {
+        return `منذ ${formatWesternNumber(Math.floor(interval))} دقيقة`;
+    }
+    return `منذ لحظات`;
+}
+
 function filterCategory(category, btnElement) {
     currentCategory = category;
     
@@ -119,6 +153,7 @@ function renderPostCard(post) {
     const isMyPost = post.author_token === userToken;
     const hasReported = localStorage.getItem(`reported_${post.id}`);
     const hasReacted = localStorage.getItem(`reacted_${post.id}`);
+    const timeAgoStr = formatTimeAgo(post.created_at);
 
     return `
         <div id="post-${post.id}" class="glass-card rounded-2xl p-5 space-y-3 shadow-xl relative hover:border-emerald-500/30 transition">
@@ -128,7 +163,7 @@ function renderPostCard(post) {
                         ${post.user_badge || 'مستخدم مجهول'}
                     </span>
                     <span class="text-[10px] bg-gray-900/80 text-gray-400 border border-gray-800 px-2 py-0.5 rounded-md">${post.category || 'عام'}</span>
-                    <span class="text-xs text-gray-500">${new Date(post.created_at).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</span>
+                    <span class="text-xs text-gray-500">${timeAgoStr}</span>
                 </div>
                 
                 <div class="flex items-center gap-3">
@@ -155,17 +190,17 @@ function renderPostCard(post) {
                 <div class="flex items-center gap-4">
                     <button onclick="reactPost('${post.id}', 'like')" class="${hasReacted === 'like' ? 'text-emerald-400 font-bold' : 'text-gray-400 hover:text-emerald-400'} flex items-center gap-1.5 transition">
                         <i class="fa-regular fa-thumbs-up"></i>
-                        <span>${post.likes_count || 0}</span>
+                        <span>${formatWesternNumber(post.likes_count || 0)}</span>
                     </button>
                     <button onclick="reactPost('${post.id}', 'dislike')" class="${hasReacted === 'dislike' ? 'text-red-400 font-bold' : 'text-gray-400 hover:text-red-400'} flex items-center gap-1.5 transition">
                         <i class="fa-regular fa-thumbs-down"></i>
-                        <span>${post.dislikes_count || 0}</span>
+                        <span>${formatWesternNumber(post.dislikes_count || 0)}</span>
                     </button>
                 </div>
 
                 <a href="post.html?id=${post.id}" class="text-emerald-400 hover:underline flex items-center gap-1.5">
                     <i class="fa-regular fa-comment"></i>
-                    <span>${post.comments_count || 0} تعليق</span>
+                    <span>${formatWesternNumber(post.comments_count || 0)} تعليق</span>
                 </a>
             </div>
         </div>
@@ -206,7 +241,7 @@ async function submitPost() {
             imageUrl = publicUrlData.publicUrl;
         }
 
-        const randomBadge = `مستخدم #${Math.floor(1000 + Math.random() * 9000)}`;
+        const randomBadge = `مستخدم #${formatWesternNumber(Math.floor(1000 + Math.random() * 9000))}`;
         const categoryValue = categoryInput ? categoryInput.value : 'عام';
 
         const { data, error } = await client.from('posts').insert([
@@ -404,7 +439,7 @@ async function loadNotifications() {
             </div>
             <div class="flex-1 text-right">
                 <p class="text-xs text-gray-200">${n.message}</p>
-                <span class="text-[10px] text-gray-500">${new Date(n.created_at).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</span>
+                <span class="text-[10px] text-gray-500">${formatTimeAgo(n.created_at)}</span>
             </div>
         </div>
     `).join('');
@@ -422,7 +457,7 @@ async function checkUnreadNotifications() {
     const badge = document.getElementById('notif-badge');
     if (badge) {
         if (!error && count > 0) {
-            badge.innerText = count > 9 ? '+9' : count;
+            badge.innerText = formatWesternNumber(count > 9 ? '+9' : count);
             badge.classList.remove('hidden');
         } else {
             badge.classList.add('hidden');
@@ -443,4 +478,3 @@ async function markAllAsRead() {
     if (badge) badge.classList.add('hidden');
     loadNotifications();
 }
-
