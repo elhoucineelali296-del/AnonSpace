@@ -159,7 +159,7 @@ function renderPostCard(post) {
         <div id="post-${post.id}" class="glass-card rounded-2xl p-5 space-y-3 shadow-xl relative hover:border-emerald-500/30 transition">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <span class="bg-emerald-900/40 text-emerald-400 border border-emerald-800/50 px-2.5 py-1 rounded-full text-[10px] font-bold">
+                    <span class="bg-emerald-600 text-white border border-emerald-800/50 px-2.5 py-1 rounded-full text-[10px] font-bold">
                         ${post.user_badge || 'مستخدم مجهول'}
                     </span>
                     <span class="text-[10px] bg-gray-900/80 text-gray-400 border border-gray-800 px-2 py-0.5 rounded-md">${post.category || 'عام'}</span>
@@ -178,7 +178,7 @@ function renderPostCard(post) {
                 </div>
             </div>
 
-            <p class="text-sm text-gray-200 leading-relaxed whitespace-pre-line">${post.content}</p>
+            <p class="text-sm text-gray-900 leading-relaxed whitespace-pre-line">${post.content}</p>
 
             ${post.image_url ? `
                 <div class="rounded-xl overflow-hidden border border-gray-800/80 max-h-80 bg-black/40">

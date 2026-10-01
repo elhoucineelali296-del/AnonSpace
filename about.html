@@ -15,13 +15,15 @@
     <style>
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: #0b0f17;
+            background-color: #ffffff;
             color: #e5e7eb;
+            
         }
 
         .bg-grid-pattern {
             background-image: radial-gradient(rgba(16, 185, 129, 0.12) 1px, transparent 1px);
             background-size: 32px 32px;
+            border: none;
         }
 
         @keyframes blob {
@@ -32,9 +34,10 @@
         .animate-blob { animation: blob 8s infinite ease-in-out; }
 
         .glass-card {
-            background-color: rgba(18, 24, 36, 0.7);
+            background-color: #34d399;
             backdrop-filter: blur(16px);
-            border: 1px solid rgba(31, 41, 55, 0.8);
+            
+
         }
 
         .btn-shine {
@@ -60,12 +63,13 @@
     <div class="fixed top-1/4 -right-20 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl animate-blob pointer-events-none"></div>
     <div class="fixed bottom-1/4 -left-20 w-96 h-96 bg-teal-500/15 rounded-full blur-3xl animate-blob animation-delay-2000 pointer-events-none"></div>
 
-    <header class="sticky top-0 z-40 glass-card border-b border-gray-800/80">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+     <header class="sticky top-0 z-40 glass-card  bg-[#DCCFC0]">
+        <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2 font-black text-xl text-white">
                 <i class="fa-solid fa-user-secret text-emerald-400"></i>
                 <span>AnonSpace</span>
             </a>
+            
             <a href="index.html" class="text-xs bg-gray-900/80 hover:bg-gray-800 text-gray-300 px-3.5 py-1.5 rounded-xl transition border border-gray-800 flex items-center gap-2">
                 <i class="fa-solid fa-arrow-right"></i>
                 <span>العودة للرئيسية</span>
@@ -73,13 +77,14 @@
         </div>
     </header>
 
+
     <main class="max-w-3xl mx-auto px-4 py-10 space-y-10 flex-1 relative z-10">
         
         <div class="text-center space-y-4">
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-2">
                 <i class="fa-solid fa-mask text-3xl"></i>
             </div>
-            <h1 class="text-3xl sm:text-4xl font-black text-white">مساحتك الآمنة للبوح بكل حرية</h1>
+            <h1 class="text-3xl sm:text-4xl font-black text-emerald-400">مساحتك الآمنة للبوح بكل حرية</h1>
             <p class="text-gray-400 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
                 <strong class="text-emerald-400">AnonSpace</strong> هي منصة تفاعلية مجهولة تماماً تتيح لك مشاركة مشاعرك، أسرارك، نصائحك، وتساؤلاتك بدون تسجيل حساب أو كشف هويتك.
             </p>
@@ -91,7 +96,7 @@
                     <i class="fa-solid fa-user-shield text-lg"></i>
                 </div>
                 <h3 class="font-bold text-white text-base">خصوصية وهوية مجهولة</h3>
-                <p class="text-xs text-gray-400 leading-relaxed">
+                <p class="text-xs text-gray-900 leading-relaxed">
                     لا نطلب منك بريداً إلكترونياً أو اسماً حقيقياً. كل مشاركة تُنسب إلى هوية مجهولة عشوائية لحماية خصوصيتك.
                 </p>
             </div>
@@ -101,7 +106,7 @@
                     <i class="fa-solid fa-bell text-lg"></i>
                 </div>
                 <h3 class="font-bold text-white text-base">إشعارات تفاعلية مخصصة</h3>
-                <p class="text-xs text-gray-400 leading-relaxed">
+                <p class="text-xs text-gray-900 leading-relaxed">
                     تلقَّ إشعارات فورية فقط عندما يتفاعل الآخرون مع مشاركاتك (إعجاب أو تعليق).
                 </p>
             </div>
@@ -111,7 +116,7 @@
                     <i class="fa-solid fa-layer-group text-lg"></i>
                 </div>
                 <h3 class="font-bold text-white text-base">تصنيفات متنوعة</h3>
-                <p class="text-xs text-gray-400 leading-relaxed">
+                <p class="text-xs text-gray-900 leading-relaxed">
                     تصفح وشارك المحتوى بحسب اهتمامك عبر تصنيفات مخصصة (أسرار، مشاعر، نصائح، وتساؤلات).
                 </p>
             </div>
@@ -121,7 +126,7 @@
                     <i class="fa-solid fa-shield-halved text-lg"></i>
                 </div>
                 <h3 class="font-bold text-white text-base">بيئة آمنة ونظيفة</h3>
-                <p class="text-xs text-gray-400 leading-relaxed">
+                <p class="text-xs text-gray-900 leading-relaxed">
                     نعتمد على نظام الإبلاغات الذكي لحجب المحتوى المسيء تلقائياً عند تلقيه 5 إبلاغات.
                 </p>
             </div>
@@ -132,14 +137,14 @@
                 <i class="fa-solid fa-scroll text-emerald-400"></i>
                 <span>قواعد الاستخدام</span>
             </h2>
-            <ul class="space-y-2 text-xs text-gray-300 list-disc list-inside leading-relaxed">
+            <ul class="space-y-2 text-xs text-[#dc2626] list-disc list-inside leading-relaxed">
                 <li>احترم جميع المستخدمين وتجنب الخطاب المسيء أو التنمر.</li>
                 <li>يُمنع نشر معلومات شخصية حساسة عن نفسك أو عن الآخرين.</li>
                 <li>استخدم ميزة الإبلاغ لمساعدتنا في إبقاء المنصة نظيفة وآمنة.</li>
             </ul>
         </div>
 
-        <div class="glass-card p-6 rounded-2xl space-y-4">
+        <div class="glass-card p-6 rounded-2xl bg-yellow-300/50 space-y-4">
             <h2 class="font-bold text-white text-base text-center">قيم تجربتك للموقع</h2>
 
             <div class="flex justify-center gap-2 text-2xl text-gray-600 cursor-pointer" id="star-rating">
@@ -152,11 +157,11 @@
 
             <textarea id="feedback-input" rows="3" placeholder="اكتب ملاحظاتك أو اقتراحاتك هنا (اختياري)..." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs text-white focus:border-emerald-500 outline-none resize-none"></textarea>
 
-            <button onclick="submitRating()" class="w-full py-2.5 bg-emerald-500 text-black font-bold text-xs rounded-xl hover:bg-emerald-400 transition">إرسال التقييم</button>
+            <button onclick="submitRating()" class="w-full py-2.5 bg-[#DCCFC0] text-black font-bold text-xs rounded-xl hover:bg-[#ffffff] transition">إرسال التقييم</button>
             
             <div class="text-center pt-2 border-t border-gray-800/60 mt-4">
-                <span class="text-xs text-gray-400 block">متوسط التقييم العام</span>
-                <div class="text-xl font-bold text-amber-400 mt-1" id="average-rating">-- / 5</div>
+                <span class="text-xs text-white block">متوسط التقييم العام</span>
+                <div class="text-xl font-bold text-white mt-1" id="average-rating">-- / 5</div>
             </div>
         </div>
 
@@ -169,7 +174,7 @@
 
     </main>
 
-    <footer class="border-t border-gray-800/80 glass-card py-5 text-center text-xs text-gray-500 relative z-10">
+    <footer class="bg-[#DCCFC0]  glass-card py-5 text-center text-xs text-gray-500 relative z-10">
         <p>جميع الحقوق محفوظة &copy; AnonSpace 2026</p>
         <p>مطور المنصة <strong>الحسين العلي </strong></p>
     </footer>

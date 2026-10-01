@@ -36,18 +36,18 @@ async function loadPostDetails() {
     container.innerHTML = `
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <span class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-xs text-accent">
+                <span class=" w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-xs text-accent">
                     <i class="fa-solid fa-mask"></i>
                 </span>
                 <div>
-                    <span class="text-xs font-semibold text-gray-300 block">${post.user_badge}</span>
+                    <span class="  text-xs font-semibold text-gray-400 block">${post.user_badge}</span>
                     <span class="text-[10px] text-gray-500">${new Date(post.created_at).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</span>
                 </div>
             </div>
             <span class="bg-gray-800/80 text-gray-400 text-[11px] px-2.5 py-0.5 rounded-full border border-gray-700">${post.category}</span>
         </div>
 
-        <p class="text-sm text-gray-200 leading-relaxed whitespace-pre-line">${post.content}</p>
+        <p class="text-sm text-black leading-relaxed whitespace-pre-line">${post.content}</p>
 
         <div class="flex items-center justify-between pt-2 border-t border-gray-800/50 text-xs text-gray-400">
             <div class="flex items-center gap-4">
@@ -184,7 +184,7 @@ function renderCommentCard(comment, replies = [], postId) {
             </div>
 
             <div id="reply-form-${comment.id}" class="hidden pt-2 border-t border-gray-800/50 space-y-2">
-                <textarea id="reply-input-${comment.id}" rows="2" placeholder="اكتب ردك هنا..." class="w-full bg-gray-950/80 border border-gray-800 rounded-lg p-2 text-xs text-white focus:border-emerald-500 outline-none resize-none"></textarea>
+                <textarea id="reply-input-${comment.id}" rows="2" placeholder="اكتب ردك هنا..." class="w-full bg-gray-300/60 border border-gray-800 rounded-lg p-2 text-xs text-white focus:border-emerald-500 outline-none resize-none"></textarea>
                 <div class="flex justify-end gap-2">
                     <button onclick="toggleReplyForm('${comment.id}')" class="px-3 py-1 rounded-md text-[10px] bg-gray-800 text-gray-400">إلغاء</button>
                     <button onclick="submitReply('${postId}', '${comment.id}')" class="px-3 py-1 rounded-md text-[10px] bg-emerald-500 text-black font-bold">إرسال الرد</button>

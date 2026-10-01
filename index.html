@@ -14,7 +14,7 @@
     <style>
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: #0b0f17;
+            background-color: #ffffff;
             color: #e5e7eb;
         }
 
@@ -35,9 +35,9 @@
         .animation-delay-4000 { animation-delay: 4s; }
 
         .glass-card {
-            background-color: rgba(18, 24, 36, 0.7);
+            background: #f1f0ec;
             backdrop-filter: blur(16px);
-            border: 1px solid rgba(31, 41, 55, 0.8);
+            
         }
 
         .btn-shine {
@@ -63,23 +63,23 @@
     <div class="fixed top-1/4 -right-20 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl animate-blob pointer-events-none"></div>
     <div class="fixed bottom-1/4 -left-20 w-96 h-96 bg-teal-500/15 rounded-full blur-3xl animate-blob animation-delay-2000 pointer-events-none"></div>
 
-    <header class="sticky top-0 z-40 glass-card border-b border-gray-800/80">
+    <header class="sticky top-0 z-40 glass-card bg-[#DCCFC0]">
         <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2 font-black text-xl text-white">
                 <div class="w-8 h-8 rounded-lg bg-emerald-500 text-black flex items-center justify-center font-bold shadow-md shadow-emerald-500/20">
-                    <i class="fa-solid fa-user-secret text-base"></i>
-                </div>
+                    <i class="fa-solid fa-user-secret text-white"></i>
+                </div class="font-black text-xl text-emerald-500">
                 <span>AnonSpace</span>
             </a>
             
             <div class="flex items-center gap-3">
-                <a href="about.html" class="text-xs text-gray-300 hover:text-emerald-400 transition flex items-center gap-1.5 bg-gray-900/60 hover:bg-gray-800/80 px-3.5 py-1.5 rounded-xl border border-gray-800">
-                    <i class="fa-solid fa-circle-info text-emerald-400"></i>
+                <a href="about.html" class="text-xs text-gray-400 hover:text-emerald-400 transition flex items-center gap-1.5 bg-white hover:bg-gray-800/80 px-3.5 py-1.5 rounded-xl border border-gray-800">
+                    <i class="fa-solid fa-circle-info text-emerald-300"></i>
                     <span>عن المنصة</span>
                 </a>
 
                 <div class="relative">
-                    <button id="notif-btn" onclick="toggleNotifications()" class="relative p-2 text-gray-300 hover:text-emerald-400 transition rounded-xl bg-gray-900/60 hover:bg-gray-800/80 border border-gray-800 flex items-center justify-center">
+                    <button id="notif-btn" onclick="toggleNotifications()" class="relative p-2 text-gray-400 hover:text-emerald-400 transition rounded-xl bg-gray-300/60 hover:bg-gray-800/80 border border-gray-800 flex items-center justify-center">
                         <i class="fa-solid fa-bell text-base"></i>
                         <span id="notif-badge" class="hidden absolute -top-1 -right-1 bg-emerald-500 text-black text-[10px] font-black rounded-full h-4 w-4 flex items-center justify-center shadow-md shadow-emerald-500/50">
                             0
@@ -91,23 +91,26 @@
                             <span class="font-bold text-xs text-white flex items-center gap-2">
                                 <i class="fa-solid fa-bell text-emerald-400"></i> الإشعارات
                             </span>
-                            <button onclick="markAllAsRead()" class="text-[11px] text-emerald-400 hover:underline">تحديد الكل كمعاين</button>
+                            <button onclick="markAllAsRead()" class="text-[11px] text-white hover:underline">تحديد الكل كمعاين</button>
                         </div>
 
-                        <div id="notif-list" class="max-h-72 overflow-y-auto divide-y divide-gray-800/40">
-                            <div class="p-4 text-center text-xs text-gray-500">لا توجد إشعارات جديدة</div>
+                        <div id="notif-list" class="max-h-72 overflow-y-auto divide-y divide-gray-600/40 bg-[#059669]/60">
+                            <div class="p-4 text-center text-black text-xs text-gray-500">لا توجد إشعارات جديدة</div>
                         </div>
                     </div>
                 </div>
             </div>
 
         </div>
+        <p class="text-center text-red-500  text-sm">
+            المنصة في مرحلة التطوير والصيانة
+        </p>
     </header>
 
     <main class="max-w-xl mx-auto px-4 py-6 space-y-6 relative z-10">
 
         <div class="glass-card rounded-2xl p-5 space-y-4 shadow-xl">
-            <textarea id="post-content" rows="3" placeholder="بوح بما في خاطرك بكل حرية وبدون إظهار هويتك..." class="w-full bg-gray-900/50 text-gray-100 placeholder-gray-500 rounded-xl p-3 text-sm border border-gray-800 focus:outline-none focus:border-emerald-500/60 transition resize-none"></textarea>
+            <textarea id="post-content" rows="3" placeholder="بوح بما في خاطرك بكل حرية وبدون إظهار هويتك..." class="w-full bg-gray-90/90 text-gray-100 placeholder-gray-500 rounded-xl p-3 text-sm border border-gray-800 focus:outline-none focus:border-emerald-500/60 transition resize-none"></textarea>
 
             <div id="image-preview-container" class="relative hidden rounded-xl overflow-hidden border border-gray-800 max-h-48 bg-black/50">
                 <img id="image-preview" src="" class="w-full object-cover max-h-48" alt="معاينة">
@@ -118,7 +121,7 @@
 
             <div class="flex items-center justify-between pt-2 border-t border-gray-800/60">
                 <div class="flex items-center gap-3">
-                    <select id="post-category" class="bg-gray-900/80 text-gray-300 border border-gray-800 rounded-xl text-xs px-3 py-2 focus:outline-none focus:border-emerald-500">
+                    <select id="post-category" class="bg-emerald-500 text-black border border-gray-800 rounded-xl text-xs px-3 py-2 focus:outline-none focus:border-emerald-500">
                         <option value="عام">عام</option>
                         <option value="أسرار">أسرار</option>
                         <option value="مشاعر">مشاعر</option>
@@ -126,7 +129,7 @@
                         <option value="تساؤلات">تساؤلات</option>
                     </select>
 
-                    <label class="cursor-pointer text-gray-400 hover:text-emerald-400 text-sm transition flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-gray-900/40 border border-gray-800">
+                    <label class="cursor-pointer text-gray-700 hover:text-emerald-400 text-sm transition flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-emerald-500/20 border border-gray-800">
                         <i class="fa-solid fa-image"></i>
                         <span class="text-xs">صورة</span>
                         <input type="file" id="post-image-input" accept="image/*" onchange="previewImage(event)" class="hidden">
@@ -141,11 +144,11 @@
         </div>
 
         <div class="flex items-center gap-2 overflow-x-auto py-1 no-scrollbar">
-            <button onclick="filterCategory('الكل', this)" class="category-btn bg-emerald-500 text-black font-bold px-4 py-1.5 rounded-xl text-xs transition shadow-md shadow-emerald-500/10 whitespace-nowrap">الكل</button>
-            <button onclick="filterCategory('أسرار', this)" class="category-btn text-gray-400 hover:text-white px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">أسرار</button>
-            <button onclick="filterCategory('مشاعر', this)" class="category-btn text-gray-400 hover:text-white px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">مشاعر</button>
-            <button onclick="filterCategory('نصائح', this)" class="category-btn text-gray-400 hover:text-white px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">نصائح</button>
-            <button onclick="filterCategory('تساؤلات', this)" class="category-btn text-gray-400 hover:text-white px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">تساؤلات</button>
+            <button onclick="filterCategory('الكل', this)" class="category-btn bg-emerald-500 hover:text-emerald-400 text-black px-4 py-1.5 rounded-xl text-xs transition  shadow-emerald-500/10 whitespace-nowrap">الكل</button>
+            <button onclick="filterCategory('أسرار', this)" class="category-btn text-black hover:text-emerald-400 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">أسرار</button>
+            <button onclick="filterCategory('مشاعر', this)" class="category-btn text-black hover:text-emerald-400 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">مشاعر</button>
+            <button onclick="filterCategory('نصائح', this)" class="category-btn text-black hover:text-emerald-400 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">نصائح</button>
+            <button onclick="filterCategory('تساؤلات', this)" class="category-btn text-black hover:text-emerald-400 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">تساؤلات</button>
         </div>
 
         <div id="posts-container" class="space-y-4">
