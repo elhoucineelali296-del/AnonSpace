@@ -1,6 +1,50 @@
 const urlParams = new URLSearchParams(window.location.search);
 const currentPostId = urlParams.get('id');
 
+
+let userToken = localStorage.getItem('anon_user_token');
+if (!userToken) {
+    userToken = 'token_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+    localStorage.setItem('anon_user_token', userToken);
+}
+
+async function notifyPostOwner(postId, message) {
+    try {
+        const { data: post } = await db.from('posts').select('author_token').eq('id', postId).single();
+        if (post && post.author_token && post.author_token !== userToken) {
+            const { error: notifErr } = await db.from('notifications').insert([
+                { post_id: postId, recipient_token: post.author_token, message: message }
+            ]);
+            if (notifErr) console.error('Notification insert error:', notifErr);
+        }
+    } catch (err) {
+        console.error('Error sending notification:', err);
+    }
+}
+
+async function handleReaction(postId, type) {
+    if (localStorage.getItem(`reacted_${postId}`)) {
+        return alert('لقد تفاعلت مع هذه المشاركة سابقاً');
+    }
+    try {
+        const field = type === 'like' ? 'likes_count' : 'dislikes_count';
+        const { data: post, error } = await db.from('posts').select(field).eq('id', postId).single();
+        if (error) throw error;
+
+        const { error: updateErr } = await db.from('posts').update({ [field]: (post[field] || 0) + 1 }).eq('id', postId);
+        if (updateErr) throw updateErr;
+
+        localStorage.setItem(`reacted_${postId}`, type);
+        await notifyPostOwner(postId, type === 'like'
+            ? '👍 أعجب أحدهم بمنشورك!'
+            : '👎 تفاعل أحدهم بعدم الإعجاب مع منشورك');
+        loadPostDetails();
+    } catch (err) {
+        console.error('Error reacting:', err);
+        alert('حدث خطأ أثناء تسجيل التفاعل');
+    }
+}
+
 function getOrGenerateBadge() {
     let badge = localStorage.getItem('anon_badge');
     if (!badge) {
@@ -30,8 +74,7 @@ async function loadPostDetails() {
         return;
     }
 
-    const interactions = JSON.parse(localStorage.getItem('user_interactions') || '{}');
-    const userAction = interactions[post.id];
+    const userAction = localStorage.getItem(`reacted_${post.id}`);
 
     container.innerHTML = `
         <div class="flex items-center justify-between">
@@ -41,7 +84,7 @@ async function loadPostDetails() {
                 </span>
                 <div>
                     <span class="  text-xs font-semibold text-gray-400 block">${post.user_badge}</span>
-                    <span class="text-[10px] text-gray-500">${new Date(post.created_at).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</span>
+                    <span class="text-[10px] text-gray-500">${new Date(post.created_at).toLocaleTimeString('ar-EG-u-nu-latn', {hour: '2-digit', minute:'2-digit'})}</span>
                 </div>
             </div>
             <span class="bg-gray-800/80 text-gray-400 text-[11px] px-2.5 py-0.5 rounded-full border border-gray-700">${post.category}</span>
@@ -121,6 +164,8 @@ async function submitComment() {
         const { data: post } = await db.from('posts').select('comments_count').eq('id', currentPostId).single();
         await db.from('posts').update({ comments_count: (post?.comments_count || 0) + 1 }).eq('id', currentPostId);
 
+        await notifyPostOwner(currentPostId, '💬 علّق شخص ما على منشورك!');
+
         input.value = '';
         loadComments();
         loadPostDetails();
@@ -155,6 +200,8 @@ async function submitReply(postId, parentCommentId) {
         const { data: post } = await db.from('posts').select('comments_count').eq('id', postId).single();
         await db.from('posts').update({ comments_count: (post?.comments_count || 0) + 1 }).eq('id', postId);
 
+        await notifyPostOwner(postId, '💬 تم الرد على تعليق في منشورك!');
+
         inputElement.value = '';
         toggleReplyForm(parentCommentId);
         loadComments();
@@ -171,7 +218,7 @@ function renderCommentCard(comment, replies = [], postId) {
         <div class="bg-gray-900/60 border border-gray-800/80 rounded-xl p-3 space-y-2">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-semibold text-accent">${comment.user_badge}</span>
-                <span class="text-[10px] text-gray-500">${new Date(comment.created_at).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</span>
+                <span class="text-[10px] text-gray-500">${new Date(comment.created_at).toLocaleTimeString('ar-EG-u-nu-latn', {hour: '2-digit', minute:'2-digit'})}</span>
             </div>
 
             <p class="text-xs text-gray-300 leading-relaxed">${comment.content}</p>
@@ -197,7 +244,7 @@ function renderCommentCard(comment, replies = [], postId) {
                         <div class="bg-gray-950/50 p-2.5 rounded-lg border border-gray-800/40 space-y-1">
                             <div class="flex items-center justify-between">
                                 <span class="text-[11px] font-semibold text-accent/80">${reply.user_badge}</span>
-                                <span class="text-[9px] text-gray-500">${new Date(reply.created_at).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</span>
+                                <span class="text-[9px] text-gray-500">${new Date(reply.created_at).toLocaleTimeString('ar-EG-u-nu-latn', {hour: '2-digit', minute:'2-digit'})}</span>
                             </div>
                             <p class="text-xs text-gray-300">${reply.content}</p>
                         </div>

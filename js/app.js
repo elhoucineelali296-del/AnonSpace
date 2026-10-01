@@ -285,7 +285,7 @@ async function reactPost(postId, type) {
 
     try {
         const field = type === 'like' ? 'likes_count' : 'dislikes_count';
-        const { data: post, error: fetchErr } = await client.from('posts').select(field).eq('id', postId).single();
+        const { data: post, error: fetchErr } = await client.from('posts').select(`${field}, author_token`).eq('id', postId).single();
         if (fetchErr) throw fetchErr;
 
         const newCount = (post[field] || 0) + 1;
@@ -295,12 +295,18 @@ async function reactPost(postId, type) {
         const { error: updateErr } = await client.from('posts').update(updateObj).eq('id', postId);
         if (updateErr) throw updateErr;
 
-        await client.from('notifications').insert([
-            { 
-                post_id: postId, 
-                message: 'تفاعل أحد الزوار مع بوحك الخفي!' 
-            }
-        ]);
+     
+        if (post.author_token && post.author_token !== userToken) {
+            await client.from('notifications').insert([
+                {
+                    post_id: postId,
+                    recipient_token: post.author_token,
+                    message: type === 'like'
+                        ? '👍 أعجب أحدهم بمنشورك!'
+                        : '👎 تفاعل أحدهم بعدم الإعجاب مع منشورك'
+                }
+            ]);
+        }
 
         localStorage.setItem(`reacted_${postId}`, type);
         showToast(type === 'like' ? 'تم تسجيل إعجابك' : 'تم تسجيل عدم إعجابك', 'success');
@@ -356,35 +362,16 @@ function initRealtimeNotifications() {
     const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
     if (!client) return;
 
-    client.channel('my-comments-notifications')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, payload => {
-            const myPostIds = getMyPostIds();
-            const newComment = payload.new;
-
-            if (myPostIds.includes(newComment.post_id) && newComment.author_token !== userToken) {
-                showToast('💬 علّق شخص ما على منشورك!', 'info');
-                fetchPosts();
-            }
-        })
-        .subscribe();
-
-    client.channel('my-likes-notifications')
-        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'posts' }, payload => {
-            const updatedPost = payload.new;
-            const oldPost = payload.old;
-
-            if (updatedPost.author_token === userToken) {
-                if (oldPost && updatedPost.likes_count > oldPost.likes_count) {
-                    showToast('❤️ حصل منشورك على إعجاب جديد!', 'success');
-                    fetchPosts();
-                }
-            }
-        })
-        .subscribe();
-
-    client.channel('db-notifications')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications' }, () => {
+    client.channel('my-notifications-' + userToken)
+        .on('postgres_changes', {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `recipient_token=eq.${userToken}`
+        }, payload => {
+            showToast(payload.new.message || 'لديك إشعار جديد', 'info');
             checkUnreadNotifications();
+            fetchPosts();
             const dropdown = document.getElementById('notif-dropdown');
             if (dropdown && !dropdown.classList.contains('hidden')) {
                 loadNotifications();
@@ -420,10 +407,11 @@ async function loadNotifications() {
     const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
     const listContainer = document.getElementById('notif-list');
     if (!listContainer || !client) return;
-    
+
     const { data: notifications, error } = await client
         .from('notifications')
         .select('*')
+        .eq('recipient_token', userToken)
         .order('created_at', { ascending: false })
         .limit(10);
 
@@ -433,7 +421,8 @@ async function loadNotifications() {
     }
 
     listContainer.innerHTML = notifications.map(n => `
-        <div class="p-3 hover:bg-gray-800/40 transition flex items-start gap-3 ${!n.is_read ? 'bg-emerald-950/20' : ''}">
+        <div onclick="openNotification('${n.id}', '${n.post_id || ''}')"
+             class="p-3 cursor-pointer hover:bg-gray-800/40 transition flex items-start gap-3 ${!n.is_read ? 'bg-emerald-950/20' : ''}">
             <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
                 <i class="fa-solid fa-heart text-xs"></i>
             </div>
@@ -445,6 +434,24 @@ async function loadNotifications() {
     `).join('');
 }
 
+async function openNotification(notifId, postId) {
+    const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
+    if (!client) return;
+
+    await client
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('id', notifId)
+        .eq('recipient_token', userToken);
+
+    if (postId) {
+        window.location.href = `post.html?id=${postId}`;
+    } else {
+        checkUnreadNotifications();
+        loadNotifications();
+    }
+}
+
 async function checkUnreadNotifications() {
     const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
     if (!client) return;
@@ -452,6 +459,7 @@ async function checkUnreadNotifications() {
     const { count, error } = await client
         .from('notifications')
         .select('*', { count: 'exact', head: true })
+        .eq('recipient_token', userToken)
         .eq('is_read', false);
 
     const badge = document.getElementById('notif-badge');
@@ -472,6 +480,7 @@ async function markAllAsRead() {
     await client
         .from('notifications')
         .update({ is_read: true })
+        .eq('recipient_token', userToken)
         .eq('is_read', false);
 
     const badge = document.getElementById('notif-badge');
