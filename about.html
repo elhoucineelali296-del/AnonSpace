@@ -11,12 +11,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
  
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
 
     <style>
         body {
             font-family: 'Cairo', sans-serif;
             background-color: #ffffff;
             color: #e5e7eb;
+            overflow-x: hidden;
             
         }
 
@@ -34,7 +36,7 @@
         .animate-blob { animation: blob 8s infinite ease-in-out; }
 
         .glass-card {
-            background-color: #34d399;
+            background-color: #f1f0ec;
             backdrop-filter: blur(16px);
             
 
@@ -95,7 +97,7 @@
                 <div class="w-10 h-10 rounded-xl bg-emerald-900/40 text-emerald-400 flex items-center justify-center">
                     <i class="fa-solid fa-user-shield text-lg"></i>
                 </div>
-                <h3 class="font-bold text-white text-base">خصوصية وهوية مجهولة</h3>
+                <h3 class="font-bold text-emerald-400 text-base">خصوصية وهوية مجهولة</h3>
                 <p class="text-xs text-gray-900 leading-relaxed">
                     لا نطلب منك بريداً إلكترونياً أو اسماً حقيقياً. كل مشاركة تُنسب إلى هوية مجهولة عشوائية لحماية خصوصيتك.
                 </p>
@@ -105,9 +107,9 @@
                 <div class="w-10 h-10 rounded-xl bg-emerald-900/40 text-emerald-400 flex items-center justify-center">
                     <i class="fa-solid fa-bell text-lg"></i>
                 </div>
-                <h3 class="font-bold text-white text-base">إشعارات تفاعلية مخصصة</h3>
+                <h3 class="font-bold text-emerald-400 text-base">إشعارات تفاعلية مخصصة</h3>
                 <p class="text-xs text-gray-900 leading-relaxed">
-                    تلقَّ إشعارات فورية فقط عندما يتفاعل الآخرون مع مشاركاتك (إعجاب أو تعليق).
+                    تلقَّ إشعارات فورية فقط عندما يتفاعل الآخرون مع مشاركاتك (إعجاب أو تعليق).
                 </p>
             </div>
 
@@ -115,7 +117,7 @@
                 <div class="w-10 h-10 rounded-xl bg-emerald-900/40 text-emerald-400 flex items-center justify-center">
                     <i class="fa-solid fa-layer-group text-lg"></i>
                 </div>
-                <h3 class="font-bold text-white text-base">تصنيفات متنوعة</h3>
+                <h3 class="font-bold text-emerald-400 text-base">تصنيفات متنوعة</h3>
                 <p class="text-xs text-gray-900 leading-relaxed">
                     تصفح وشارك المحتوى بحسب اهتمامك عبر تصنيفات مخصصة (أسرار، مشاعر، نصائح، وتساؤلات).
                 </p>
@@ -125,7 +127,7 @@
                 <div class="w-10 h-10 rounded-xl bg-emerald-900/40 text-emerald-400 flex items-center justify-center">
                     <i class="fa-solid fa-shield-halved text-lg"></i>
                 </div>
-                <h3 class="font-bold text-white text-base">بيئة آمنة ونظيفة</h3>
+                <h3 class="font-bold text-emerald-400 text-base">بيئة آمنة ونظيفة</h3>
                 <p class="text-xs text-gray-900 leading-relaxed">
                     نعتمد على نظام الإبلاغات الذكي لحجب المحتوى المسيء تلقائياً عند تلقيه 5 إبلاغات.
                 </p>
@@ -134,8 +136,8 @@
 
         <div class="glass-card p-6 rounded-2xl space-y-4">
             <h2 class="font-bold text-white text-base flex items-center gap-2">
-                <i class="fa-solid fa-scroll text-emerald-400"></i>
-                <span>قواعد الاستخدام</span>
+                <i class="fa-solid fa-scroll text-emerald-400 "></i>
+                <span class="text-emerald-400">قواعد الاستخدام</span>
             </h2>
             <ul class="space-y-2 text-xs text-[#dc2626] list-disc list-inside leading-relaxed">
                 <li>احترم جميع المستخدمين وتجنب الخطاب المسيء أو التنمر.</li>
@@ -144,7 +146,7 @@
             </ul>
         </div>
 
-        <div class="glass-card p-6 rounded-2xl bg-yellow-300/50 space-y-4">
+        <div class="glass-card p-6 rounded-2xl bg-emerald-200 space-y-4">
             <h2 class="font-bold text-white text-base text-center">قيم تجربتك للموقع</h2>
 
             <div class="flex justify-center gap-2 text-2xl text-gray-600 cursor-pointer" id="star-rating">
@@ -155,7 +157,7 @@
                 <i class="fa-solid fa-star star transition-colors" data-value="5"></i>
             </div>
 
-            <textarea id="feedback-input" rows="3" placeholder="اكتب ملاحظاتك أو اقتراحاتك هنا (اختياري)..." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs text-white focus:border-emerald-500 outline-none resize-none"></textarea>
+            <textarea id="feedback-input" rows="3" placeholder="اكتب ملاحظاتك أو اقتراحاتك هنا (اختياري)..." class="w-full  border border-gray-800 rounded-xl p-3 text-xs text-white focus:border-emerald-500 outline-none resize-none"></textarea>
 
             <button onclick="submitRating()" class="w-full py-2.5 bg-[#DCCFC0] text-black font-bold text-xs rounded-xl hover:bg-[#ffffff] transition">إرسال التقييم</button>
             

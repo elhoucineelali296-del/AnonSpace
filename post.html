@@ -10,12 +10,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
 
     <style>
         body {
             font-family: 'Cairo', sans-serif;
             background-color: #ffffff;
             color: #e5e7eb;
+            overflow-x: hidden;
         }
 
         .bg-grid-pattern {
@@ -56,7 +58,7 @@
 </head>
 <body class="min-h-screen bg-grid-pattern relative">
 
-    <div class="fixed top-1/4 -right-20 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl animate-blob pointer-events-none"></div>
+    <div class="fixed top-1/4 -right-20 w-96 h-96 bg-emerald-100/15 rounded-full blur-3xl animate-blob pointer-events-none"></div>
 
   
     <header class="sticky top-0 z-40 glass-card  bg-[#DCCFC0]">
@@ -83,7 +85,7 @@
 
         
         <div class="glass-card rounded-2xl p-4 space-y-3">
-            <h3 class="text-xs font-bold text-gray-400 flex items-center gap-2">
+            <h3 class="text-xs font-bold text-gray-800 flex items-center gap-2">
                 <i class="fa-solid fa-comment-dots text-emerald-400"></i>
                 <span>أضف تعليقك المجهول</span>
             </h3>
@@ -98,7 +100,8 @@
       
         <div class="space-y-3">
             <h4 class="text-xs font-bold text-gray-400 px-1">التعليقات</h4>
-            <div id="comments-container" class="space-y-2">
+            <div id="comments-container" class="space-y-2 max-h-96 overflow-y-auto">
+                <div class="text-center text-xs text-gray-500 py-8">لا توجد تعليقات بعد. كن أول من يعلق!</div>
                 
             </div>
         </div>

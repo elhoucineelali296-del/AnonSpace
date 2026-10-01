@@ -16,6 +16,7 @@
             font-family: 'Cairo', sans-serif;
             background-color: #ffffff;
             color: #e5e7eb;
+            overflow-x: hidden;
         }
 
         .bg-grid-pattern {
@@ -60,8 +61,8 @@
 </head>
 <body class="min-h-screen bg-grid-pattern relative selection:bg-emerald-500 selection:text-black">
 
-    <div class="fixed top-1/4 -right-20 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl animate-blob pointer-events-none"></div>
-    <div class="fixed bottom-1/4 -left-20 w-96 h-96 bg-teal-500/15 rounded-full blur-3xl animate-blob animation-delay-2000 pointer-events-none"></div>
+    <div class="fixed top-1/4 -right-20 w-96 h-96 bg-emerald-100/15 rounded-full blur-3xl animate-blob pointer-events-none"></div>
+    <div class="fixed bottom-1/4 -left-20 w-96 h-96 bg-teal-100/15 rounded-full blur-3xl animate-blob animation-delay-2000 pointer-events-none"></div>
 
     <header class="sticky top-0 z-40 glass-card bg-[#DCCFC0]">
         <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -86,15 +87,15 @@
                         </span>
                     </button>
 
-                    <div id="notif-dropdown" class="hidden absolute left-0 mt-3 w-80 glass-card rounded-2xl shadow-2xl border border-gray-800 z-50 overflow-hidden">
-                        <div class="p-3 border-b border-gray-800/80 flex items-center justify-between bg-gray-900/40">
+                    <div id="notif-dropdown" class="hidden absolute left-0 mt-3 w-80 glass-card rounded-2xl shadow-2xl  z-50 overflow-hidden">
+                        <div class="p-3  flex items-center justify-between bg-gray-900/40">
                             <span class="font-bold text-xs text-white flex items-center gap-2">
                                 <i class="fa-solid fa-bell text-emerald-400"></i> الإشعارات
                             </span>
                             <button onclick="markAllAsRead()" class="text-[11px] text-white hover:underline">تحديد الكل كمعاين</button>
                         </div>
 
-                        <div id="notif-list" class="max-h-72 overflow-y-auto divide-y divide-gray-600/40 bg-[#059669]/60">
+                        <div id="notif-list" class="max-h-72 overflow-y-auto divide-y divide-gray-600/40 bg-gray-900/40">
                             <div class="p-4 text-center text-black text-xs text-gray-500">لا توجد إشعارات جديدة</div>
                         </div>
                     </div>
@@ -103,25 +104,25 @@
 
         </div>
         <p class="text-center text-red-500  text-sm">
-        </strong> <strong> ملاحظة: المنصة في مرحلة التطوير والصيانة
+        </strong> <strong> ملاحظة: المنصة في طور التطوير والصيانة
         </p>
     </header>
 
     <main class="max-w-xl mx-auto px-4 py-6 space-y-6 relative z-10">
 
         <div class="glass-card rounded-2xl p-5 space-y-4 shadow-xl">
-            <textarea id="post-content" rows="3" placeholder="بوح بما في خاطرك بكل حرية وبدون إظهار هويتك..." class="w-full bg-gray-90/90 text-gray-100 placeholder-gray-500 rounded-xl p-3 text-sm border border-gray-800 focus:outline-none focus:border-emerald-500/60 transition resize-none"></textarea>
+            <textarea id="post-content" rows="3" placeholder="بوح بما في خاطرك بكل حرية وبدون إظهار هويتك..." class="w-full bg-gray-90/90 text-gray-200 placeholder-gray-500 rounded-xl p-3 text-sm border border-gray-200 focus:outline-none focus:border-emerald-500/60 transition resize-none"></textarea>
 
-            <div id="image-preview-container" class="relative hidden rounded-xl overflow-hidden border border-gray-800 max-h-48 bg-black/50">
+            <div id="image-preview-container" class="relative hidden rounded-xl overflow-hidden border border-gray-200 max-h-48 bg-black/50">
                 <img id="image-preview" src="" class="w-full object-cover max-h-48" alt="معاينة">
                 <button onclick="removeSelectedImage()" class="absolute top-2 left-2 bg-red-600/80 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs transition">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <div class="flex items-center justify-between pt-2 border-t border-gray-800/60">
+            <div class="flex items-center justify-between pt-2 border-t border-gray-200/60">
                 <div class="flex items-center gap-3">
-                    <select id="post-category" class="bg-emerald-500 text-black border border-gray-800 rounded-xl text-xs px-3 py-2 focus:outline-none focus:border-emerald-500">
+                    <select id="post-category" class=" text-black border border-gray-800 rounded-xl text-xs px-1 py-1 focus:outline-none focus:border-emerald-500">
                         <option value="عام">عام</option>
                         <option value="أسرار">أسرار</option>
                         <option value="مشاعر">مشاعر</option>
@@ -129,7 +130,7 @@
                         <option value="تساؤلات">تساؤلات</option>
                     </select>
 
-                    <label class="cursor-pointer text-gray-700 hover:text-emerald-400 text-sm transition flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-emerald-500/20 border border-gray-800">
+                    <label class="cursor-pointer text-black hover:text-emerald-400 text-sm transition flex items-center gap-1.5 px-2 py-1.5 rounded-lg  border border-gray-800">
                         <i class="fa-solid fa-image"></i>
                         <span class="text-xs">صورة</span>
                         <input type="file" id="post-image-input" accept="image/*" onchange="previewImage(event)" class="hidden">

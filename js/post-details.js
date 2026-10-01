@@ -215,16 +215,16 @@ async function submitReply(postId, parentCommentId) {
 
 function renderCommentCard(comment, replies = [], postId) {
     return `
-        <div class="bg-gray-900/60 border border-gray-800/80 rounded-xl p-3 space-y-2">
+        <div class="bg-emerald-200 rounded-xl p-3 space-y-2">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-accent">${comment.user_badge}</span>
-                <span class="text-[10px] text-gray-500">${new Date(comment.created_at).toLocaleTimeString('ar-EG-u-nu-latn', {hour: '2-digit', minute:'2-digit'})}</span>
+                <span class="text-xs font-semibold text-accent text-white">${comment.user_badge}</span>
+                <span class="text-[10px] text-white">${new Date(comment.created_at).toLocaleTimeString('ar-EG-u-nu-latn', {hour: '2-digit', minute:'2-digit'})}</span>
             </div>
 
-            <p class="text-xs text-gray-300 leading-relaxed">${comment.content}</p>
+            <p class="text-xs text-white leading-relaxed">${comment.content}</p>
 
             <div class="flex items-center gap-2 pt-1">
-                <button onclick="toggleReplyForm('${comment.id}')" class="text-[11px] text-emerald-400 hover:underline flex items-center gap-1">
+                <button onclick="toggleReplyForm('${comment.id}')" class="text-[11px] text-black hover:underline flex items-center gap-1">
                     <i class="fa-solid fa-reply text-[10px]"></i>
                     <span>رد (${replies.length})</span>
                 </button>

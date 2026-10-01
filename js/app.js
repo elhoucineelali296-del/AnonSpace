@@ -162,7 +162,7 @@ function renderPostCard(post) {
                     <span class="bg-emerald-600 text-white border border-emerald-800/50 px-2.5 py-1 rounded-full text-[10px] font-bold">
                         ${post.user_badge || 'مستخدم مجهول'}
                     </span>
-                    <span class="text-[10px] bg-gray-900/80 text-gray-400 border border-gray-800 px-2 py-0.5 rounded-md">${post.category || 'عام'}</span>
+                    <span class="text-[10px] bg-gray-900/80 text-gray-200 border border-gray-200 px-2 py-0.5 rounded-md">${post.category || 'عام'}</span>
                     <span class="text-xs text-gray-500">${timeAgoStr}</span>
                 </div>
                 
@@ -181,18 +181,18 @@ function renderPostCard(post) {
             <p class="text-sm text-gray-900 leading-relaxed whitespace-pre-line">${post.content}</p>
 
             ${post.image_url ? `
-                <div class="rounded-xl overflow-hidden border border-gray-800/80 max-h-80 bg-black/40">
+                <div class="rounded-xl overflow-hidden border border-gray-200/80 max-h-80 bg-black/40">
                     <img src="${post.image_url}" class="w-full object-cover max-h-80" loading="lazy" alt="مرفق المشاركة">
                 </div>
             ` : ''}
 
-            <div class="flex items-center justify-between border-t border-gray-800/60 pt-3 text-xs">
+            <div class="flex items-center justify-between border-t border-gray-200/60 pt-3 text-xs">
                 <div class="flex items-center gap-4">
-                    <button onclick="reactPost('${post.id}', 'like')" class="${hasReacted === 'like' ? 'text-emerald-400 font-bold' : 'text-gray-400 hover:text-emerald-400'} flex items-center gap-1.5 transition">
+                    <button onclick="reactPost('${post.id}', 'like')" class="${hasReacted === 'like' ? 'text-emerald-400 font-bold' : 'text-gray-200 hover:text-emerald-400'} flex items-center gap-1.5 transition">
                         <i class="fa-regular fa-thumbs-up"></i>
                         <span>${formatWesternNumber(post.likes_count || 0)}</span>
                     </button>
-                    <button onclick="reactPost('${post.id}', 'dislike')" class="${hasReacted === 'dislike' ? 'text-red-400 font-bold' : 'text-gray-400 hover:text-red-400'} flex items-center gap-1.5 transition">
+                    <button onclick="reactPost('${post.id}', 'dislike')" class="${hasReacted === 'dislike' ? 'text-red-400 font-bold' : 'text-gray-200 hover:text-red-400'} flex items-center gap-1.5 transition">
                         <i class="fa-regular fa-thumbs-down"></i>
                         <span>${formatWesternNumber(post.dislikes_count || 0)}</span>
                     </button>
