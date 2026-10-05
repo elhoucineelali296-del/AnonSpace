@@ -4,6 +4,9 @@ if (!userToken) {
     localStorage.setItem('anon_user_token', userToken);
 }
 
+const LAST_POST_KEY = 'last_post_timestamp';
+const COOLDOWN_TIME = 30000;
+
 function saveMyPostId(postId) {
     let myPosts = JSON.parse(localStorage.getItem('my_posts_ids') || '[]');
     if (!myPosts.includes(postId)) {
@@ -19,6 +22,16 @@ function getMyPostIds() {
 let selectedImageFile = null;
 let currentCategory = 'الكل';
 
+function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 function formatWesternNumber(num) {
     const arabicNums = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
     return String(num).replace(/[٠-٩]/g, d => arabicNums.indexOf(d));
@@ -32,23 +45,23 @@ function formatTimeAgo(dateString) {
 
     let interval = seconds / 31536000;
     if (interval > 1) {
-        return `منذ ${formatWesternNumber(Math.floor(interval))} سنة`;
+        return `منذ ${formatWesternNumber(Math.floor(interval))} سنوات`;
     }
     interval = seconds / 2592000;
     if (interval > 1) {
-        return `منذ ${formatWesternNumber(Math.floor(interval))} شهر`;
+        return `منذ ${formatWesternNumber(Math.floor(interval))} أشهر`;
     }
     interval = seconds / 86400;
     if (interval > 1) {
-        return `منذ ${formatWesternNumber(Math.floor(interval))} يوم`;
+        return `منذ ${formatWesternNumber(Math.floor(interval))} أيام`;
     }
     interval = seconds / 3600;
     if (interval > 1) {
-        return `منذ ${formatWesternNumber(Math.floor(interval))} ساعة`;
+        return `منذ ${formatWesternNumber(Math.floor(interval))} ساعات`;
     }
     interval = seconds / 60;
     if (interval > 1) {
-        return `منذ ${formatWesternNumber(Math.floor(interval))} دقيقة`;
+        return `منذ ${formatWesternNumber(Math.floor(interval))} دقائق`;
     }
     return `منذ لحظات`;
 }
@@ -79,7 +92,7 @@ function showToast(message, type = 'info') {
         type === 'success' ? 'bg-emerald-900/90 border-emerald-500' :
         type === 'error' ? 'bg-red-900/90 border-red-500' : 'bg-gray-900/90 border-emerald-500'
     }`;
-    toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check text-emerald-400' : type === 'error' ? 'fa-triangle-exclamation text-red-400' : 'fa-bell text-emerald-400'}"></i><span>${message}</span>`;
+    toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check text-emerald-400' : type === 'error' ? 'fa-triangle-exclamation text-red-400' : 'fa-bell text-emerald-400'}"></i><span>${escapeHtml(message)}</span>`;
     
     container.appendChild(toast);
     setTimeout(() => toast.classList.remove('translate-y-2'), 10);
@@ -119,7 +132,6 @@ async function fetchPosts() {
     try {
         const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
         if (!client) {
-            console.error('لم يتم العثور على كائن الاتصال بقاعدة البيانات db');
             container.innerHTML = `<div class="text-center py-12 text-red-400 text-xs">خطأ في الاتصال بقاعدة البيانات. تأكد من إعدادات Supabase.</div>`;
             return;
         }
@@ -138,7 +150,7 @@ async function fetchPosts() {
         if (error) throw error;
 
         if (!posts || posts.length === 0) {
-            container.innerHTML = `<div class="text-center py-12 text-gray-500 text-xs">لا توجد مشاركات ${currentCategory !== 'الكل' ? `في تصنيف (${currentCategory})` : ''} حالياً. كن أول من يبوح!</div>`;
+            container.innerHTML = `<div class="text-center py-12 text-gray-500 text-xs">لا توجد مشاركات ${currentCategory !== 'الكل' ? `في تصنيف (${escapeHtml(currentCategory)})` : ''} حالياً. كن أول من يبوح!</div>`;
             return;
         }
 
@@ -159,10 +171,10 @@ function renderPostCard(post) {
         <div id="post-${post.id}" class="glass-card rounded-2xl p-5 space-y-3 shadow-xl relative hover:border-emerald-500/30 transition">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <span class="bg-emerald-600 text-white border border-emerald-800/50 px-2.5 py-1 rounded-full text-[10px] font-bold">
-                        ${post.user_badge || 'مستخدم مجهول'}
+                    <span class="bg-[#34d399] text-slate-900 px-2.5 py-1 rounded-full text-[10px] font-bold">
+                        ${escapeHtml(post.user_badge || 'مستخدم مجهول')}
                     </span>
-                    <span class="text-[10px] bg-gray-900/80 text-gray-200 border border-gray-200 px-2 py-0.5 rounded-md">${post.category || 'عام'}</span>
+                    <span class="text-[10px] bg-gray-900/80 text-gray-200 border border-gray-200 px-2 py-0.5 rounded-md">${escapeHtml(post.category || 'عام')}</span>
                     <span class="text-xs text-gray-500">${timeAgoStr}</span>
                 </div>
                 
@@ -178,11 +190,11 @@ function renderPostCard(post) {
                 </div>
             </div>
 
-            <p class="text-sm text-gray-900 leading-relaxed whitespace-pre-line">${post.content}</p>
+            <p class="text-sm text-slate-800 leading-relaxed whitespace-pre-line">${escapeHtml(post.content)}</p>
 
             ${post.image_url ? `
                 <div class="rounded-xl overflow-hidden border border-gray-200/80 max-h-80 bg-black/40">
-                    <img src="${post.image_url}" class="w-full object-cover max-h-80" loading="lazy" alt="مرفق المشاركة">
+                    <img src="${escapeHtml(post.image_url)}" class="w-full object-cover max-h-80" loading="lazy" alt="مرفق المشاركة">
                 </div>
             ` : ''}
 
@@ -212,6 +224,11 @@ async function submitPost() {
     const contentInput = document.getElementById('post-content');
     const categoryInput = document.getElementById('post-category');
     const submitBtn = document.getElementById('submit-btn');
+
+    const lastPost = localStorage.getItem(LAST_POST_KEY);
+    if (lastPost && (Date.now() - parseInt(lastPost)) < COOLDOWN_TIME) {
+        return showToast('يرجى الانتظار 30 ثانية قبل إضافة منشور جديد', 'error');
+    }
 
     const content = contentInput ? contentInput.value.trim() : '';
     if (!content) return showToast('الرجاء كتابة نص المشاركة أولاً', 'error');
@@ -261,6 +278,8 @@ async function submitPost() {
             saveMyPostId(data[0].id);
         }
 
+        localStorage.setItem(LAST_POST_KEY, Date.now().toString());
+
         if (contentInput) contentInput.value = '';
         removeSelectedImage();
         showToast('تم نشر مشاركتك بنجاح!', 'success');
@@ -295,7 +314,6 @@ async function reactPost(postId, type) {
         const { error: updateErr } = await client.from('posts').update(updateObj).eq('id', postId);
         if (updateErr) throw updateErr;
 
-     
         if (post.author_token && post.author_token !== userToken) {
             await client.from('notifications').insert([
                 {
@@ -427,7 +445,7 @@ async function loadNotifications() {
                 <i class="fa-solid fa-heart text-xs"></i>
             </div>
             <div class="flex-1 text-right">
-                <p class="text-xs text-gray-200">${n.message}</p>
+                <p class="text-xs text-gray-200">${escapeHtml(n.message)}</p>
                 <span class="text-[10px] text-gray-500">${formatTimeAgo(n.created_at)}</span>
             </div>
         </div>
