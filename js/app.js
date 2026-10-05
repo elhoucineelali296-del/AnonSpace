@@ -71,14 +71,15 @@ function filterCategory(category, btnElement) {
     
     const buttons = document.querySelectorAll('.category-btn');
     buttons.forEach(btn => {
-        btn.classList.remove('bg-emerald-500', 'text-black', 'font-bold');
-        btn.classList.add('text-gray-400');
+        const isSelected = btn === btnElement || btn.textContent.trim() === category;
+        if (isSelected) {
+            btn.classList.add('bg-emerald-500', 'text-black', 'font-bold');
+            btn.classList.remove('text-gray-400');
+        } else {
+            btn.classList.remove('bg-emerald-500', 'text-black', 'font-bold');
+            btn.classList.add('text-gray-400');
+        }
     });
-
-    if (btnElement) {
-        btnElement.classList.add('bg-emerald-500', 'text-black', 'font-bold');
-        btnElement.classList.remove('text-gray-400');
-    }
 
     fetchPosts();
 }
