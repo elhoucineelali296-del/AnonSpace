@@ -44,9 +44,9 @@ body {
 }
 
 header {
-  background: rgba(255, 255, 255, 0.9);
+  background: #DCCFC0;
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-color);
+  border: none;
   position: sticky;
   top: 0;
   z-index: 50;
@@ -319,7 +319,7 @@ footer {
 
 <header>
   <div class="bar">
-    <a class="logo" href="#">
+    <a class="logo" href="welcome.html">
       <i class="fa-solid fa-user-secret"></i>
       <span>AnonSpace</span>
     </a>
@@ -416,7 +416,7 @@ footer {
 </footer>
 
 <script>
-// إنشاء الفهرس الديناميكي للروابط
+
 ['privacy', 'terms'].forEach(function(id) {
   var list = document.getElementById(id === 'privacy' ? 'toc-p' : 'toc-t');
   document.querySelectorAll('#' + id + ' h3').forEach(function(h, i) {
