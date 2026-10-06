@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title> AnonSpace - privacy</title>
+<meta name="description" content="سياسة الخصوصية وشروط الاستخدام الكاملة لمنصة AnonSpace المساحة الآمنة للبوح بكل حرية.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --primary: #10b981;
+  --primary-light: #d1fae5;
+  --primary-dark: #059669;
+  --text-main: #334155;
+  --text-muted: #64748b;
+  --heading: #0f172a;
+  --bg-page: #e5e0d8;
+  --bg-card: #f8fafc;
+  --border-color: #e2e8f0;
+}
+
+* { 
+  box-sizing: border-box; 
+}
+
+html { 
+  scroll-behavior: smooth; 
+  scroll-padding-top: 100px; 
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-page);
+  background-image: radial-gradient(at 50% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 0%);
+  background-attachment: fixed;
+  color: var(--text-main);
+  font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
+}
+
+header {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.bar {
+  max-width: 900px;
+  margin: auto;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+}
+
+.logo {
+  font-weight: 800;
+  color: var(--heading);
+  text-decoration: none;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: -0.5px;
+}
+
+.logo i {
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 1.2rem;
+}
+
+main {
+  max-width: 860px;
+  margin: auto;
+  padding: 48px 24px 80px;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0 0 12px;
+  color: var(--primary);
+  letter-spacing: -0.5px;
+}
+
+.updated {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: white;
+  display: inline-flex;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+
+.summary {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-inline-start: 5px solid var(--primary);
+  padding: 24px;
+  border-radius: 20px;
+  margin-bottom: 40px;
+  color: var(--text-main);
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+  font-size: 1.05rem;
+}
+
+.summary strong {
+  color: var(--primary-dark);
+  font-weight: 700;
+  display: block;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+.toc {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.toc-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.toc-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.toc-card h2 {
+  font-size: 1.15rem;
+  margin: 0 0 16px;
+  color: var(--heading);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toc-card h2 i {
+  color: var(--primary);
+}
+
+.toc ol {
+  margin: 0;
+  padding-inline-start: 0;
+  font-size: 0.95rem;
+  line-height: 2.2;
+  list-style: none;
+  counter-reset: toc-counter;
+}
+
+.toc li {
+  counter-increment: toc-counter;
+  margin-bottom: 4px;
+}
+
+.toc li::before {
+  content: counter(toc-counter) ".";
+  color: var(--primary);
+  font-weight: bold;
+  margin-inline-end: 8px;
+}
+
+.toc a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.toc a:hover {
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 40px;
+  margin-bottom: 32px;
+  counter-reset: section-counter;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+}
+
+section > h2 {
+  margin: 0 0 24px;
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--heading);
+  border-bottom: 2px solid var(--bg-page);
+  padding-bottom: 16px;
+}
+
+h3 {
+  margin: 32px 0 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--heading);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+h3::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: var(--primary);
+  border-radius: 50%;
+}
+
+p, li {
+  margin: 0 0 12px;
+  color: var(--text-main);
+}
+
+ul {
+  padding-inline-start: 24px;
+  margin: 0 0 20px;
+  list-style: none;
+}
+
+ul li {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+ul li::before {
+  content: "\f058";
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  right: -24px;
+  color: var(--primary);
+  font-size: 0.9rem;
+  top: 4px;
+}
+
+a {
+  color: var(--primary-dark);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+a:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.note {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-inline-start: 5px solid #f59e0b;
+  padding: 16px 20px;
+  border-radius: 16px;
+  margin-top: 24px;
+  color: #92400e;
+  font-size: 0.95rem;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.note i {
+  color: #f59e0b;
+  font-size: 1.2rem;
+  margin-top: 2px;
+}
+
+footer {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  padding: 0 24px 48px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+@media(max-width: 768px) {
+  .toc { grid-template-columns: 1fr; }
+  section { padding: 24px; }
+  h1 { font-size: 1.8rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <a class="logo" href="#">
+      <i class="fa-solid fa-user-secret"></i>
+      <span>AnonSpace</span>
+    </a>
+  </div>
+</header>
+
+<main>
+  <div class="page-header">
+    <h1>الخصوصية وشروط الاستخدام</h1>
+    <div class="updated">
+      <i class="fa-regular fa-calendar-check"></i>
+      <span>آخر تحديث: أكتوبر 2026</span>
+    </div>
+  </div>
+
+  <div class="summary">
+    <strong>مساحتك الآمنة للبوح بكل حرية</strong>
+    نحن في AnonSpace نؤمن بخصوصيتك. منصتنا لا تتطلب تسجيل حساب، ولا تطلب بريداً إلكترونياً أو اسماً حقيقياً. نمنحك التحكم الكامل بحذف منشوراتك الخاصة، ونعتمد على وعي المجتمع ونظام الإبلاغات الذكي للحفاظ على بيئة آمنة ونظيفة.
+  </div>
+
+  <nav class="toc" aria-label="الفهرس">
+    <div class="toc-card">
+      <h2><i class="fa-solid fa-shield-halved"></i> سياسة الخصوصية</h2>
+      <ol id="toc-p"></ol>
+    </div>
+    <div class="toc-card">
+      <h2><i class="fa-solid fa-file-contract"></i> شروط الاستخدام</h2>
+      <ol id="toc-t"></ol>
+    </div>
+  </nav>
+
+  <section id="privacy">
+    <h2>سياسة الخصوصية</h2>
+
+    <h3>هوية مجهولة تماماً</h3>
+    <p>لا يطلب منك موقع AnonSpace بريداً إلكترونياً أو اسماً حقيقياً أو أي بيانات شخصية. كل مشاركة تُنسب إلى هوية مجهولة عشوائية لحماية خصوصيتك بالكامل. أنت تشارك مشاعرك، أسرارك، وتساؤلاتك دون أي أثر يدل عليك.</p>
+
+    <h3>البيانات الفنية والتحكم بالمحتوى</h3>
+    <p>لضمان تجربة سلسة وتوفير ميزات مثل "إشعارات تفاعلية مخصصة"، نقوم بتوليد معرّف عشوائي (Token) يُحفظ محلياً في متصفحك. هذا المعرّف:</p>
+    <ul>
+      <li>لا يرتبط بأي معلومات شخصية عنك.</li>
+      <li>يتيح لك استلام إشعارات فورية فقط عندما يتفاعل الآخرون مع مشاركاتك.</li>
+      <li><strong>يمنحك الصلاحية الحصرية لحذف منشوراتك الخاصة</strong> في أي وقت من نفس المتصفح الذي قمت بالنشر منه.</li>
+    </ul>
+
+    <h3>كيف نستخدم البيانات التقنية؟</h3>
+    <ul>
+      <li>عرض المنشورات والتعليقات ضمن التصنيفات المتنوعة التي اخترتها (أسرار، مشاعر، نصائح، تساؤلات).</li>
+      <li>تشغيل نظام الإشعارات الذكي والمخصص لك.</li>
+      <li>منع البريد المزعج (Spam) وحماية المنصة من الهجمات التقنية.</li>
+    </ul>
+
+    <h3>التخزين المحلي (Local Storage)</h3>
+    <p>نحن لا نستخدم ملفات تعريف الارتباط (Cookies) التتبعية المزعجة. نعتمد فقط على التخزين المحلي في متصفحك لحفظ معرّفك المجهول. إذا قمت بمسح بيانات متصفحك، ستفقد القدرة على تلقي إشعارات لمنشوراتك السابقة أو حذفها، وسيتم اعتبارك مستخدماً جديداً مجهولاً.</p>
+
+    <h3>الأطراف الثالثة والأمان</h3>
+    <p>تُحفظ البيانات التقنية والنصوص المشفرة في خوادم سحابية آمنة (مثل Supabase). لا نقوم ببيع أو مشاركة أو تحليل أي نصوص لأغراض إعلانية. كل ما يُكتب هنا يبقى داخل بيئة AnonSpace فقط.</p>
+  </section>
+
+  <section id="terms">
+    <h2>شروط الاستخدام</h2>
+
+    <h3>قواعد الاستخدام الأساسية</h3>
+    <p>للحفاظ على AnonSpace كبيئة آمنة ونظيفة للجميع، يُشترط على جميع المستخدمين الالتزام بالقواعد التالية:</p>
+    <ul>
+      <li><strong>احترام الجميع:</strong> يُمنع منعاً باتاً استخدام لغة مسيئة، أو السب، أو التنمر، أو التحرش، أو تجنب الخطاب العنصري والمحرض على الكراهية.</li>
+      <li><strong>حماية الخصوصية:</strong> يُمنع نشر معلومات شخصية حساسة عن نفسك أو عن الآخرين (مثل الأسماء الحقيقية، أرقام الهواتف، أو العناوين).</li>
+      <li><strong>منع المحتوى الخطير:</strong> يُمنع الترويج لإيذاء النفس، أو العنف، أو أي محتوى يخالف القوانين العامة والأخلاق.</li>
+    </ul>
+
+    <h3>صلاحياتك على المحتوى</h3>
+    <p>بصفتك ناشر المحتوى، أنت تتحمل المسؤولية الكاملة عما تكتبه. المنصة تمنحك أداة برمجية تتيح لك <strong>حذف منشوراتك الخاصة متى شئت</strong> طالما أنك تستخدم نفس المتصفح. لا يحق لك محاولة التلاعب أو حذف منشورات لا تخصك.</p>
+
+    <h3>بيئة آمنة ونظيفة (نظام الإبلاغات)</h3>
+    <p>نحن نعتمد على مجتمعنا للحفاظ على جودة المنصة. يرجى استخدام ميزة الإبلاغ لمساعدتنا في إبقاء المنصة نظيفة وآمنة. يعتمد النظام على الإشراف الذكي؛ حيث <strong>يُحجب المحتوى المسيء تلقائياً فور تلقيه 5 إبلاغات</strong> من مستخدمين مختلفين، ويتم إخفاؤه لمراجعته وحذفه نهائياً.</p>
+
+    <h3>إخلاء المسؤولية والدعم</h3>
+    <p>تُقدم منصة AnonSpace مساحة حرة للتعبير، ولكنها ليست بديلاً عن الدعم النفسي أو الطبي أو القانوني المتخصص. المنشورات تعبر عن آراء أصحابها المجهولين، ولا نضمن صحة أو دقة أي نصيحة تُنشر هنا.</p>
+
+    <div class="note">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <div>
+        <strong>ملاحظة هامة:</strong> إذا كنت تمر بظروف نفسية صعبة أو تفكر في إيذاء نفسك، نرجو منك بشدة التواصل مع خطوط الدعم النفسي والطوارئ في بلدك. أنت لست وحدك، وهناك دائماً من يستطيع مساعدتك باحترافية.
+      </div>
+    </div>
+
+    <h3>تعديل الشروط وإنهاء الخدمة</h3>
+    <p>نحتفظ بالحق في تعديل هذه الشروط في أي وقت لتلائم تطور المنصة. كما يحق لنا تقييد وصول أي مستخدم ينتهك القواعد ويستغل ميزة إخفاء الهوية للإضرار بالآخرين.</p>
+  </section>
+</main>
+
+<footer>
+  <p>جميع الحقوق محفوظة &copy; 2026 - AnonSpace مساحتك الآمنة</p>
+</footer>
+
+<script>
+// إنشاء الفهرس الديناميكي للروابط
+['privacy', 'terms'].forEach(function(id) {
+  var list = document.getElementById(id === 'privacy' ? 'toc-p' : 'toc-t');
+  document.querySelectorAll('#' + id + ' h3').forEach(function(h, i) {
+    h.id = id + '-' + (i + 1);
+    var li = document.createElement('li');
+    var a = document.createElement('a');
+    a.href = '#' + h.id;
+    a.textContent = h.textContent;
+    li.appendChild(a);
+    list.appendChild(li);
+  });
+});
+</script>
+</body>
+</html>
