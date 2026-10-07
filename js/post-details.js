@@ -1,48 +1,68 @@
 const urlParams = new URLSearchParams(window.location.search);
 const currentPostId = urlParams.get('id');
 
-
 let userToken = localStorage.getItem('anon_user_token');
 if (!userToken) {
-    userToken = 'token_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+    const rand = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID().replace(/-/g, '')
+        : Math.random().toString(36).substring(2) + Date.now().toString(36);
+    userToken = 'token_' + rand;
     localStorage.setItem('anon_user_token', userToken);
 }
 
-async function notifyPostOwner(postId, message) {
-    try {
-        const { data: post } = await db.from('posts').select('author_token').eq('id', postId).single();
-        if (post && post.author_token && post.author_token !== userToken) {
-            const { error: notifErr } = await db.from('notifications').insert([
-                { post_id: postId, recipient_token: post.author_token, message: message }
-            ]);
-            if (notifErr) console.error('Notification insert error:', notifErr);
-        }
-    } catch (err) {
-        console.error('Error sending notification:', err);
-    }
+function getClient() {
+    return window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
 }
 
-async function handleReaction(postId, type) {
-    if (localStorage.getItem(`reacted_${postId}`)) {
-        return alert('لقد تفاعلت مع هذه المشاركة سابقاً');
-    }
-    try {
-        const field = type === 'like' ? 'likes_count' : 'dislikes_count';
-        const { data: post, error } = await db.from('posts').select(field).eq('id', postId).single();
-        if (error) throw error;
+function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 
-        const { error: updateErr } = await db.from('posts').update({ [field]: (post[field] || 0) + 1 }).eq('id', postId);
-        if (updateErr) throw updateErr;
+function formatWesternNumber(num) {
+    const arabicNums = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    return String(num).replace(/[٠-٩]/g, d => arabicNums.indexOf(d));
+}
 
-        localStorage.setItem(`reacted_${postId}`, type);
-        await notifyPostOwner(postId, type === 'like'
-            ? '👍 أعجب أحدهم بمنشورك!'
-            : '👎 تفاعل أحدهم بعدم الإعجاب مع منشورك');
-        loadPostDetails();
-    } catch (err) {
-        console.error('Error reacting:', err);
-        alert('حدث خطأ أثناء تسجيل التفاعل');
-    }
+function formatTimeAgo(dateString) {
+    if (!dateString) return '';
+    const seconds = Math.floor((new Date() - new Date(dateString)) / 1000);
+
+    let interval = seconds / 31536000;
+    if (interval > 1) return `منذ ${formatWesternNumber(Math.floor(interval))} سنوات`;
+    interval = seconds / 2592000;
+    if (interval > 1) return `منذ ${formatWesternNumber(Math.floor(interval))} أشهر`;
+    interval = seconds / 86400;
+    if (interval > 1) return `منذ ${formatWesternNumber(Math.floor(interval))} أيام`;
+    interval = seconds / 3600;
+    if (interval > 1) return `منذ ${formatWesternNumber(Math.floor(interval))} ساعات`;
+    interval = seconds / 60;
+    if (interval > 1) return `منذ ${formatWesternNumber(Math.floor(interval))} دقائق`;
+    return `منذ لحظات`;
+}
+
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `px-4 py-3 rounded-xl text-xs font-semibold text-white shadow-2xl backdrop-blur border flex items-center gap-2 transition-all duration-300 transform translate-y-2 ${
+        type === 'success' ? 'bg-emerald-900/90 border-emerald-500' :
+        type === 'error' ? 'bg-red-900/90 border-red-500' : 'bg-gray-900/90 border-emerald-500'
+    }`;
+    toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check text-emerald-400' : type === 'error' ? 'fa-triangle-exclamation text-red-400' : 'fa-bell text-emerald-400'}"></i><span>${escapeHtml(message)}</span>`;
+
+    container.appendChild(toast);
+    setTimeout(() => toast.classList.remove('translate-y-2'), 10);
+    setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
 }
 
 function getOrGenerateBadge() {
@@ -55,6 +75,38 @@ function getOrGenerateBadge() {
     return badge;
 }
 
+function errMessage(err) {
+    return String((err && err.message) || '');
+}
+
+async function handleReaction(postId, type) {
+    if (localStorage.getItem(`reacted_${postId}`)) {
+        return showToast('لقد تفاعلت مع هذه المشاركة سابقاً', 'error');
+    }
+    const client = getClient();
+    if (!client) return;
+
+    try {
+        const { error } = await client.rpc('react_post', {
+            p_post_id: String(postId),
+            p_type: type,
+            p_token: userToken
+        });
+        if (error) throw error;
+
+        localStorage.setItem(`reacted_${postId}`, type);
+        showToast(type === 'like' ? 'تم تسجيل إعجابك' : 'تم تسجيل عدم إعجابك', 'success');
+        loadPostDetails();
+    } catch (err) {
+        console.error('Error reacting:', err);
+        if (errMessage(err).includes('already_reacted')) {
+            localStorage.setItem(`reacted_${postId}`, type);
+            return showToast('لقد تفاعلت مع هذه المشاركة سابقاً', 'error');
+        }
+        showToast('حدث خطأ أثناء تسجيل التفاعل', 'error');
+    }
+}
+
 async function loadPostDetails() {
     if (!currentPostId) {
         window.location.href = 'index.html';
@@ -62,48 +114,56 @@ async function loadPostDetails() {
     }
 
     const container = document.getElementById('single-post-container');
+    const client = getClient();
+    if (!client || !container) return;
 
-    const { data: post, error } = await db
-        .from('posts')
-        .select('*')
-        .eq('id', currentPostId)
-        .single();
+    const { data: post, error } = await client.rpc('get_post', {
+        p_post_id: String(currentPostId)
+    });
 
     if (error || !post) {
+        if (error) console.error('Error loading post:', error);
         container.innerHTML = '<div class="text-center text-rose-500 py-4">لم يتم العثور على البوست.</div>';
         return;
     }
 
     const userAction = localStorage.getItem(`reacted_${post.id}`);
+    const postIdAttr = escapeHtml(post.id);
 
     container.innerHTML = `
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <span class=" w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-xs text-accent">
-                    <i class="fa-solid fa-mask"></i>
+                <span class="bg-[#34d399] text-slate-900 px-2.5 py-1 rounded-full text-[10px] font-bold">
+                    ${escapeHtml(post.user_badge || 'مستخدم مجهول')}
                 </span>
-                <div>
-                    <span class="  text-xs font-semibold text-gray-400 block">${post.user_badge}</span>
-                    <span class="text-[10px] text-gray-500">${new Date(post.created_at).toLocaleTimeString('ar-EG-u-nu-latn', {hour: '2-digit', minute:'2-digit'})}</span>
-                </div>
+                <span class="text-[10px] bg-gray-900/80 text-gray-200 border border-gray-200 px-2 py-0.5 rounded-md">${escapeHtml(post.category || 'عام')}</span>
+                <span class="text-xs text-gray-500">${formatTimeAgo(post.created_at)}</span>
             </div>
-            <span class="bg-gray-800/80 text-gray-400 text-[11px] px-2.5 py-0.5 rounded-full border border-gray-700">${post.category}</span>
         </div>
 
-        <p class="text-sm text-black leading-relaxed whitespace-pre-line">${post.content}</p>
+        <p class="text-sm text-slate-800 leading-relaxed whitespace-pre-line">${escapeHtml(post.content)}</p>
 
-        <div class="flex items-center justify-between pt-2 border-t border-gray-800/50 text-xs text-gray-400">
+        ${post.image_url ? `
+            <div class="rounded-xl overflow-hidden border border-gray-200/80 max-h-80 bg-black/40">
+                <img src="${escapeHtml(post.image_url)}" class="w-full object-cover max-h-80" loading="lazy" alt="مرفق المشاركة">
+            </div>
+        ` : ''}
+
+        <div class="flex items-center justify-between border-t border-gray-200/60 pt-3 text-xs">
             <div class="flex items-center gap-4">
-                <button onclick="handleReaction('${post.id}', 'like')" class="flex items-center gap-1.5 transition ${userAction === 'like' ? 'text-emerald-400 font-bold' : 'hover:text-emerald-400'}">
+                <button onclick="handleReaction('${postIdAttr}', 'like')" class="${userAction === 'like' ? 'text-emerald-400 font-bold' : 'text-gray-600 hover:text-emerald-500'} flex items-center gap-1.5 transition">
                     <i class="fa-regular fa-thumbs-up"></i>
-                    <span>${post.likes_count}</span>
+                    <span>${formatWesternNumber(post.likes_count || 0)}</span>
                 </button>
-                <button onclick="handleReaction('${post.id}', 'dislike')" class="flex items-center gap-1.5 transition ${userAction === 'dislike' ? 'text-rose-400 font-bold' : 'hover:text-rose-400'}">
+                <button onclick="handleReaction('${postIdAttr}', 'dislike')" class="${userAction === 'dislike' ? 'text-red-400 font-bold' : 'text-gray-600 hover:text-red-400'} flex items-center gap-1.5 transition">
                     <i class="fa-regular fa-thumbs-down"></i>
-                    <span>${post.dislikes_count}</span>
+                    <span>${formatWesternNumber(post.dislikes_count || 0)}</span>
                 </button>
             </div>
-            <span class="text-gray-500"><i class="fa-regular fa-comment"></i> ${post.comments_count} تعليقات</span>
+            <span class="text-emerald-400 flex items-center gap-1.5">
+                <i class="fa-regular fa-comment"></i>
+                <span>${formatWesternNumber(post.comments_count || 0)} تعليق</span>
+            </span>
         </div>
     `;
 }
@@ -112,13 +172,13 @@ async function loadComments() {
     if (!currentPostId) return;
 
     const container = document.getElementById('comments-container');
-    if (!container) return;
+    const client = getClient();
+    if (!container || !client) return;
 
     try {
-        const { data: allComments, error } = await db
-            .from('comments')
-            .select('*')
-            .eq('post_id', currentPostId);
+        const { data: allComments, error } = await client.rpc('get_comments', {
+            p_post_id: String(currentPostId)
+        });
 
         if (error) throw error;
 
@@ -127,13 +187,11 @@ async function loadComments() {
             return;
         }
 
-        allComments.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-
         const mainComments = allComments.filter(c => !c.parent_id);
         const replies = allComments.filter(c => c.parent_id);
 
         container.innerHTML = mainComments.map(comment => {
-            const commentReplies = replies.filter(r => r.parent_id === comment.id);
+            const commentReplies = replies.filter(r => String(r.parent_id) === String(comment.id));
             return renderCommentCard(comment, commentReplies, currentPostId);
         }).join('');
 
@@ -143,6 +201,14 @@ async function loadComments() {
     }
 }
 
+function commentErrorToast(err, fallback) {
+    const msg = errMessage(err);
+    if (msg.includes('cooldown')) return showToast('يرجى الانتظار قليلاً قبل التعليق مرة أخرى', 'error');
+    if (msg.includes('invalid_content')) return showToast('نص التعليق يجب أن يكون بين 1 و 1000 حرف', 'error');
+    if (msg.includes('not_found')) return showToast('المنشور أو التعليق لم يعد موجوداً', 'error');
+    showToast(fallback, 'error');
+}
+
 async function submitComment() {
     if (!currentPostId) return;
 
@@ -150,29 +216,29 @@ async function submitComment() {
     if (!input) return;
 
     const content = input.value.trim();
-    if (!content) return alert('يرجى كتابة نص التعليق أولاً');
+    if (!content) return showToast('يرجى كتابة نص التعليق أولاً', 'error');
 
-    const badge = getOrGenerateBadge();
+    const client = getClient();
+    if (!client) return;
 
     try {
-        const { error: commentError } = await db.from('comments').insert([
-            { post_id: currentPostId, content: content, user_badge: badge, parent_id: null }
-        ]);
-
-        if (commentError) throw commentError;
-
-        const { data: post } = await db.from('posts').select('comments_count').eq('id', currentPostId).single();
-        await db.from('posts').update({ comments_count: (post?.comments_count || 0) + 1 }).eq('id', currentPostId);
-
-        await notifyPostOwner(currentPostId, '💬 علّق شخص ما على منشورك!');
+        const { error } = await client.rpc('add_comment', {
+            p_post_id: String(currentPostId),
+            p_parent_id: null,
+            p_content: content,
+            p_badge: getOrGenerateBadge(),
+            p_token: userToken
+        });
+        if (error) throw error;
 
         input.value = '';
+        showToast('تم إضافة تعليقك', 'success');
         loadComments();
         loadPostDetails();
 
     } catch (err) {
         console.error('Error submitting comment:', err);
-        alert('حدث خطأ أثناء إضافة التعليق');
+        commentErrorToast(err, 'حدث خطأ أثناء إضافة التعليق');
     }
 }
 
@@ -181,72 +247,70 @@ async function submitReply(postId, parentCommentId) {
     if (!inputElement) return;
 
     const content = inputElement.value.trim();
-    if (!content) return alert('يرجى كتابة نص الرد أولاً');
+    if (!content) return showToast('يرجى كتابة نص الرد أولاً', 'error');
 
-    const badge = getOrGenerateBadge();
+    const client = getClient();
+    if (!client) return;
 
     try {
-        const { error } = await db.from('comments').insert([
-            {
-                post_id: postId,
-                parent_id: parentCommentId,
-                content: content,
-                user_badge: badge
-            }
-        ]);
-
+        const { error } = await client.rpc('add_comment', {
+            p_post_id: String(postId),
+            p_parent_id: String(parentCommentId),
+            p_content: content,
+            p_badge: getOrGenerateBadge(),
+            p_token: userToken
+        });
         if (error) throw error;
-
-        const { data: post } = await db.from('posts').select('comments_count').eq('id', postId).single();
-        await db.from('posts').update({ comments_count: (post?.comments_count || 0) + 1 }).eq('id', postId);
-
-        await notifyPostOwner(postId, '💬 تم الرد على تعليق في منشورك!');
 
         inputElement.value = '';
         toggleReplyForm(parentCommentId);
+        showToast('تم إرسال ردك', 'success');
         loadComments();
         loadPostDetails();
 
     } catch (err) {
         console.error('Error submitting reply:', err);
-        alert('حدث خطأ أثناء إرسال الرد');
+        commentErrorToast(err, 'حدث خطأ أثناء إرسال الرد');
     }
 }
 
 function renderCommentCard(comment, replies = [], postId) {
+    const cid = escapeHtml(comment.id);
+    const pid = escapeHtml(postId);
+
     return `
-        <div class="bg-emerald-200 rounded-xl p-3 space-y-2">
+        <div class="bg-[#fbf2cd] border border-gray-200/80 rounded-xl p-3 space-y-2">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-accent text-white">${comment.user_badge}</span>
-                <span class="text-[10px] text-white">${new Date(comment.created_at).toLocaleTimeString('ar-EG-u-nu-latn', {hour: '2-digit', minute:'2-digit'})}</span>
+                <span class="bg-[#34d399] text-slate-900 px-2 py-0.5 rounded-full text-[10px] font-bold">${escapeHtml(comment.user_badge || 'مستخدم مجهول')}</span>
+                <span class="text-[10px] text-gray-500">${formatTimeAgo(comment.created_at)}</span>
             </div>
 
-            <p class="text-xs text-white leading-relaxed">${comment.content}</p>
+            <p class="text-xs text-slate-800 leading-relaxed whitespace-pre-line">${escapeHtml(comment.content)}</p>
 
             <div class="flex items-center gap-2 pt-1">
-                <button onclick="toggleReplyForm('${comment.id}')" class="text-[11px] text-black hover:underline flex items-center gap-1">
+                <button onclick="toggleReplyForm('${cid}')" class="text-[11px] text-emerald-600 hover:underline flex items-center gap-1">
                     <i class="fa-solid fa-reply text-[10px]"></i>
-                    <span>رد (${replies.length})</span>
+                    <span>رد (${formatWesternNumber(replies.length)})</span>
                 </button>
             </div>
 
-            <div id="reply-form-${comment.id}" class="hidden pt-2 border-t border-gray-800/50 space-y-2">
-                <textarea id="reply-input-${comment.id}" rows="2" placeholder="اكتب ردك هنا..." class="w-full bg-gray-300/60 border border-gray-800 rounded-lg p-2 text-xs text-white focus:border-emerald-500 outline-none resize-none"></textarea>
+            <div id="reply-form-${cid}" class="hidden pt-2 border-t border-gray-200/60 space-y-2">
+                <textarea id="reply-input-${cid}" rows="2" maxlength="1000" placeholder="اكتب ردك هنا..." class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-slate-800 focus:border-emerald-500 outline-none resize-none"></textarea>
                 <div class="flex justify-end gap-2">
-                    <button onclick="toggleReplyForm('${comment.id}')" class="px-3 py-1 rounded-md text-[10px] bg-gray-800 text-gray-400">إلغاء</button>
-                    <button onclick="submitReply('${postId}', '${comment.id}')" class="px-3 py-1 rounded-md text-[10px] bg-emerald-500 text-black font-bold">إرسال الرد</button>
+                    <button onclick="toggleReplyForm('${cid}')" class="px-3 py-1 rounded-md text-[10px] bg-gray-200 text-gray-700">إلغاء</button>
+                    <button onclick="submitReply('${pid}', '${cid}')" class="px-3 py-1 rounded-md text-[10px] bg-emerald-500 text-black font-bold">إرسال الرد</button>
                 </div>
             </div>
 
             ${replies.length > 0 ? `
-                <div class="mr-3 pr-2 border-r-2 border-emerald-500/30 space-y-2 mt-2">
+                <div class="mr-3 pr-2 border-r-2 border-emerald-500/40 space-y-2 mt-2">
                     ${replies.map(reply => `
-                        <div class="bg-gray-950/50 p-2.5 rounded-lg border border-gray-800/40 space-y-1">
+                        <div class="bg-white/60 p-2.5 rounded-lg border border-gray-200/70 space-y-1">
                             <div class="flex items-center justify-between">
-                                <span class="text-[11px] font-semibold text-accent/80">${reply.user_badge}</span>
-                                <span class="text-[9px] text-gray-500">${new Date(reply.created_at).toLocaleTimeString('ar-EG-u-nu-latn', {hour: '2-digit', minute:'2-digit'})}</span>
+                                <span class="bg-[#34d399] text-slate-900 px-2 py-0.5 rounded-full text-[9px] font-bold">${escapeHtml(reply.user_badge || 'مستخدم مجهول')}</span>
+                                <span class="text-[9px] text-gray-500">${formatTimeAgo(reply.created_at)}</span>
                             </div>
-                            <p class="text-xs text-gray-300">${reply.content}</p>
+                            <p class="text-xs text-slate-800 whitespace-pre-line">${escapeHtml(reply.content)}</p>
                         </div>
                     `).join('')}
                 </div>
@@ -263,20 +327,10 @@ function toggleReplyForm(commentId) {
 }
 
 function openPostDetails(postId) {
-    window.location.href = `post.html?id=${postId}`;
+    window.location.href = `post.html?id=${encodeURIComponent(postId)}`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     loadPostDetails();
     loadComments();
 });
-
-function escapeHtml(text) {
-    if (!text) return '';
-    return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}

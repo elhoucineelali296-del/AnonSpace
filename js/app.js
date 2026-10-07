@@ -1,7 +1,14 @@
 let userToken = localStorage.getItem('anon_user_token');
 if (!userToken) {
-    userToken = 'token_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+    const rand = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID().replace(/-/g, '')
+        : Math.random().toString(36).substring(2) + Date.now().toString(36);
+    userToken = 'token_' + rand;
     localStorage.setItem('anon_user_token', userToken);
+}
+
+function getClient() {
+    return window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
 }
 
 const LAST_POST_KEY = 'last_post_timestamp';
@@ -137,16 +144,10 @@ async function fetchPosts() {
             return;
         }
 
-        let query = client
-            .from('posts')
-            .select('*')
-            .or('reports_count.lt.5,reports_count.is.null');
-
-        if (currentCategory && currentCategory !== 'الكل') {
-            query = query.eq('category', currentCategory);
-        }
-
-        const { data: posts, error } = await query.order('created_at', { ascending: false });
+        const { data: posts, error } = await client.rpc('get_posts', {
+            p_category: (currentCategory && currentCategory !== 'الكل') ? currentCategory : null,
+            p_token: userToken
+        });
 
         if (error) throw error;
 
@@ -163,7 +164,7 @@ async function fetchPosts() {
 }
 
 function renderPostCard(post) {
-    const isMyPost = post.author_token === userToken;
+    const isMyPost = post.is_mine === true;
     const hasReported = localStorage.getItem(`reported_${post.id}`);
     const hasReacted = localStorage.getItem(`reacted_${post.id}`);
     const timeAgoStr = formatTimeAgo(post.created_at);
@@ -243,7 +244,14 @@ async function submitPost() {
 
     try {
         if (selectedImageFile) {
-            const fileExt = selectedImageFile.name.split('.').pop();
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+            if (!allowedTypes.includes(selectedImageFile.type)) {
+                throw new Error('invalid_image_type');
+            }
+            if (selectedImageFile.size > 5 * 1024 * 1024) {
+                throw new Error('image_too_large');
+            }
+            const fileExt = selectedImageFile.type.split('/')[1];
             const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
             
             const { error: uploadError } = await client.storage
@@ -259,24 +267,19 @@ async function submitPost() {
             imageUrl = publicUrlData.publicUrl;
         }
 
-        const randomBadge = `مستخدم #${formatWesternNumber(Math.floor(1000 + Math.random() * 9000))}`;
         const categoryValue = categoryInput ? categoryInput.value : 'عام';
 
-        const { data, error } = await client.from('posts').insert([
-            {
-                content: content,
-                category: categoryValue,
-                user_badge: randomBadge,
-                image_url: imageUrl,
-                author_token: userToken,
-                reports_count: 0
-            }
-        ]).select();
+        const { data, error } = await client.rpc('create_post', {
+            p_content: content,
+            p_category: categoryValue,
+            p_image_url: imageUrl,
+            p_token: userToken
+        });
 
         if (error) throw error;
 
-        if (data && data[0]) {
-            saveMyPostId(data[0].id);
+        if (data && data.id !== undefined) {
+            saveMyPostId(data.id);
         }
 
         localStorage.setItem(LAST_POST_KEY, Date.now().toString());
@@ -288,7 +291,16 @@ async function submitPost() {
 
     } catch (err) {
         console.error(err);
-        showToast('حدث خطأ أثناء النشر. أعد المحاولة.', 'error');
+        const msg = String(err && err.message || '');
+        if (msg.includes('cooldown')) {
+            showToast('يرجى الانتظار 30 ثانية قبل إضافة منشور جديد', 'error');
+        } else if (msg.includes('invalid_image_type')) {
+            showToast('نوع الصورة غير مدعوم (JPG, PNG, WEBP, GIF)', 'error');
+        } else if (msg.includes('image_too_large')) {
+            showToast('حجم الصورة يجب ألا يتجاوز 5 ميغابايت', 'error');
+        } else {
+            showToast('حدث خطأ أثناء النشر. أعد المحاولة.', 'error');
+        }
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;
@@ -304,28 +316,12 @@ async function reactPost(postId, type) {
     }
 
     try {
-        const field = type === 'like' ? 'likes_count' : 'dislikes_count';
-        const { data: post, error: fetchErr } = await client.from('posts').select(`${field}, author_token`).eq('id', postId).single();
-        if (fetchErr) throw fetchErr;
-
-        const newCount = (post[field] || 0) + 1;
-        const updateObj = {};
-        updateObj[field] = newCount;
-
-        const { error: updateErr } = await client.from('posts').update(updateObj).eq('id', postId);
-        if (updateErr) throw updateErr;
-
-        if (post.author_token && post.author_token !== userToken) {
-            await client.from('notifications').insert([
-                {
-                    post_id: postId,
-                    recipient_token: post.author_token,
-                    message: type === 'like'
-                        ? '👍 أعجب أحدهم بمنشورك!'
-                        : '👎 تفاعل أحدهم بعدم الإعجاب مع منشورك'
-                }
-            ]);
-        }
+        const { error } = await client.rpc('react_post', {
+            p_post_id: String(postId),
+            p_type: type,
+            p_token: userToken
+        });
+        if (error) throw error;
 
         localStorage.setItem(`reacted_${postId}`, type);
         showToast(type === 'like' ? 'تم تسجيل إعجابك' : 'تم تسجيل عدم إعجابك', 'success');
@@ -333,6 +329,10 @@ async function reactPost(postId, type) {
         fetchPosts();
     } catch (err) {
         console.error(err);
+        if (String(err && err.message || '').includes('already_reacted')) {
+            localStorage.setItem(`reacted_${postId}`, type);
+            return showToast('لقد تفاعلت مع هذه المشاركة سابقاً', 'error');
+        }
         showToast('حدث خطأ أثناء تسجيل التفاعل', 'error');
     }
 }
@@ -342,8 +342,12 @@ async function deletePost(postId) {
     if (!confirm('هل أنت متأكد من إرادة حذف هذه المشاركة؟')) return;
 
     try {
-        const { error } = await client.from('posts').delete().eq('id', postId).eq('author_token', userToken);
+        const { data: deleted, error } = await client.rpc('delete_post', {
+            p_post_id: String(postId),
+            p_token: userToken
+        });
         if (error) throw error;
+        if (!deleted) throw new Error('not_deleted');
 
         showToast('تم حذف المنشور بنجاح', 'success');
         document.getElementById(`post-${postId}`)?.remove();
@@ -359,10 +363,11 @@ async function reportPost(postId) {
     }
 
     try {
-        const { data: post } = await client.from('posts').select('reports_count').eq('id', postId).single();
-        const updatedReports = (post?.reports_count || 0) + 1;
-
-        await client.from('posts').update({ reports_count: updatedReports }).eq('id', postId);
+        const { data: updatedReports, error } = await client.rpc('report_post', {
+            p_post_id: String(postId),
+            p_token: userToken
+        });
+        if (error) throw error;
 
         localStorage.setItem(`reported_${postId}`, 'true');
         showToast('شكراً لمساعدتنا، تم تسجيل إبلاغك', 'success');
@@ -373,36 +378,37 @@ async function reportPost(postId) {
             fetchPosts();
         }
     } catch (err) {
+        if (String(err && err.message || '').includes('already_reported')) {
+            localStorage.setItem(`reported_${postId}`, 'true');
+            return showToast('لقد قمت بالإبلاغ عن هذا المنشور سابقاً', 'error');
+        }
         showToast('حدث خطأ أثناء إرسال الإبلاغ', 'error');
     }
 }
 
-function initRealtimeNotifications() {
-    const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
-    if (!client) return;
+let lastUnreadCount = null;
 
-    client.channel('my-notifications-' + userToken)
-        .on('postgres_changes', {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'notifications',
-            filter: `recipient_token=eq.${userToken}`
-        }, payload => {
-            showToast(payload.new.message || 'لديك إشعار جديد', 'info');
-            checkUnreadNotifications();
-            fetchPosts();
+function initRealtimeNotifications() {
+    // Realtime مباشر على جدول notifications لم يعد ممكناً بعد تفعيل RLS،
+    // لذلك نفحص الإشعارات كل 20 ثانية عبر دالة آمنة.
+    setInterval(async () => {
+        if (document.hidden) return;
+        const count = await checkUnreadNotifications();
+        if (count !== null && lastUnreadCount !== null && count > lastUnreadCount) {
+            showToast('لديك إشعار جديد', 'info');
             const dropdown = document.getElementById('notif-dropdown');
             if (dropdown && !dropdown.classList.contains('hidden')) {
                 loadNotifications();
             }
-        })
-        .subscribe();
+        }
+        if (count !== null) lastUnreadCount = count;
+    }, 20000);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchPosts();
     initRealtimeNotifications();
-    checkUnreadNotifications();
+    checkUnreadNotifications().then(c => { if (c !== null) lastUnreadCount = c; });
 });
 
 function toggleNotifications() {
@@ -427,12 +433,9 @@ async function loadNotifications() {
     const listContainer = document.getElementById('notif-list');
     if (!listContainer || !client) return;
 
-    const { data: notifications, error } = await client
-        .from('notifications')
-        .select('*')
-        .eq('recipient_token', userToken)
-        .order('created_at', { ascending: false })
-        .limit(10);
+    const { data: notifications, error } = await client.rpc('get_my_notifications', {
+        p_token: userToken
+    });
 
     if (error || !notifications || notifications.length === 0) {
         listContainer.innerHTML = `<div class="p-4 text-center text-xs text-gray-500">لا توجد إشعارات حالياً</div>`;
@@ -457,11 +460,10 @@ async function openNotification(notifId, postId) {
     const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
     if (!client) return;
 
-    await client
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('id', notifId)
-        .eq('recipient_token', userToken);
+    await client.rpc('mark_notification_read', {
+        p_id: String(notifId),
+        p_token: userToken
+    });
 
     if (postId) {
         window.location.href = `post.html?id=${postId}`;
@@ -472,35 +474,31 @@ async function openNotification(notifId, postId) {
 }
 
 async function checkUnreadNotifications() {
-    const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
-    if (!client) return;
+    const client = getClient();
+    if (!client) return null;
 
-    const { count, error } = await client
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('recipient_token', userToken)
-        .eq('is_read', false);
+    const { data, error } = await client.rpc('count_unread_notifications', {
+        p_token: userToken
+    });
+    const count = (!error && typeof data === 'number') ? data : 0;
 
     const badge = document.getElementById('notif-badge');
     if (badge) {
         if (!error && count > 0) {
-            badge.innerText = formatWesternNumber(count > 9 ? '+9' : count);
+            badge.innerText = count > 9 ? '+9' : formatWesternNumber(count);
             badge.classList.remove('hidden');
         } else {
             badge.classList.add('hidden');
         }
     }
+    return error ? null : count;
 }
 
 async function markAllAsRead() {
     const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
     if (!client) return;
 
-    await client
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('recipient_token', userToken)
-        .eq('is_read', false);
+    await client.rpc('mark_all_notifications_read', { p_token: userToken });
 
     const badge = document.getElementById('notif-badge');
     if (badge) badge.classList.add('hidden');
