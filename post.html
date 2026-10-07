@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AnonSpace - post</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#DCCFC0">
+    <link rel="icon" type="image/png" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <link rel="stylesheet" href="/theme.css">
+    <script src="js/theme.js"></script>
    
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -68,10 +74,15 @@
                 <span>AnonSpace</span>
             </a>
             
-            <a href="index.html" class="text-xs bg-gray-900/80 hover:bg-gray-800 text-gray-300 px-3.5 py-1.5 rounded-xl transition border border-gray-800 flex items-center gap-2">
-                <i class="fa-solid fa-arrow-right"></i>
-                <span>العودة للرئيسية</span>
-            </a>
+            <div class="flex items-center gap-2">
+                <a href="index.html" class="text-xs bg-gray-900/80 hover:bg-gray-800 text-gray-300 px-3.5 py-1.5 rounded-xl transition border border-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-right"></i>
+                    <span>العودة للرئيسية</span>
+                </a>
+                <button id="theme-toggle" type="button" class="p-2 w-9 h-9 text-gray-400 hover:text-emerald-400 transition rounded-xl bg-gray-300/60 hover:bg-gray-800/80 border border-gray-800 flex items-center justify-center" title="الوضع الليلي">
+                        <i class="fa-solid fa-moon text-base"></i>
+                    </button>
+            </div>
         </div>
     </header>
 
@@ -113,5 +124,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/post-details.js"></script>
+    <script src="js/pwa.js"></script>
 </body>
 </html>

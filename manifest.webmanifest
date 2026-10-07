@@ -1,0 +1,16 @@
+{
+  "name": "AnonSpace",
+  "short_name": "AnonSpace",
+  "description": "منصة مجهولة بالكامل للتعبير عن مشاعرك وأفكارك بدون حساب.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/welcome.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#e5e0d8",
+  "theme_color": "#DCCFC0",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

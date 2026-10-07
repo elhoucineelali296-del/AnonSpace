@@ -160,10 +160,16 @@ async function loadPostDetails() {
                     <span>${formatWesternNumber(post.dislikes_count || 0)}</span>
                 </button>
             </div>
-            <span class="text-emerald-400 flex items-center gap-1.5">
-                <i class="fa-regular fa-comment"></i>
-                <span>${formatWesternNumber(post.comments_count || 0)} تعليق</span>
-            </span>
+            <div class="flex items-center gap-4">
+                <button onclick="sharePost('${postIdAttr}')" class="text-gray-600 hover:text-emerald-500 flex items-center gap-1.5 transition" title="مشاركة رابط المنشور">
+                    <i class="fa-solid fa-share-nodes"></i>
+                    <span>مشاركة</span>
+                </button>
+                <span class="text-emerald-400 flex items-center gap-1.5">
+                    <i class="fa-regular fa-comment"></i>
+                    <span>${formatWesternNumber(post.comments_count || 0)} تعليق</span>
+                </span>
+            </div>
         </div>
     `;
 }
@@ -177,7 +183,8 @@ async function loadComments() {
 
     try {
         const { data: allComments, error } = await client.rpc('get_comments', {
-            p_post_id: String(currentPostId)
+            p_post_id: String(currentPostId),
+            p_token: userToken
         });
 
         if (error) throw error;
@@ -282,7 +289,10 @@ function renderCommentCard(comment, replies = [], postId) {
         <div class="bg-[#fbf2cd] border border-gray-200/80 rounded-xl p-3 space-y-2">
             <div class="flex items-center justify-between">
                 <span class="bg-[#34d399] text-slate-900 px-2 py-0.5 rounded-full text-[10px] font-bold">${escapeHtml(comment.user_badge || 'مستخدم مجهول')}</span>
-                <span class="text-[10px] text-gray-500">${formatTimeAgo(comment.created_at)}</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] text-gray-500">${formatTimeAgo(comment.created_at)}</span>
+                    ${comment.can_delete ? `<button onclick="deleteComment('${cid}')" class="text-gray-500 hover:text-red-400 text-[11px] transition" title="حذف التعليق"><i class="fa-solid fa-trash"></i></button>` : ''}
+                </div>
             </div>
 
             <p class="text-xs text-slate-800 leading-relaxed whitespace-pre-line">${escapeHtml(comment.content)}</p>
@@ -308,7 +318,10 @@ function renderCommentCard(comment, replies = [], postId) {
                         <div class="bg-white/60 p-2.5 rounded-lg border border-gray-200/70 space-y-1">
                             <div class="flex items-center justify-between">
                                 <span class="bg-[#34d399] text-slate-900 px-2 py-0.5 rounded-full text-[9px] font-bold">${escapeHtml(reply.user_badge || 'مستخدم مجهول')}</span>
-                                <span class="text-[9px] text-gray-500">${formatTimeAgo(reply.created_at)}</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[9px] text-gray-500">${formatTimeAgo(reply.created_at)}</span>
+                                    ${reply.can_delete ? `<button onclick="deleteComment('${escapeHtml(reply.id)}')" class="text-gray-500 hover:text-red-400 text-[10px] transition" title="حذف الرد"><i class="fa-solid fa-trash"></i></button>` : ''}
+                                </div>
                             </div>
                             <p class="text-xs text-slate-800 whitespace-pre-line">${escapeHtml(reply.content)}</p>
                         </div>
@@ -317,6 +330,46 @@ function renderCommentCard(comment, replies = [], postId) {
             ` : ''}
         </div>
     `;
+}
+
+async function deleteComment(commentId) {
+    if (!confirm('هل تريد حذف هذا التعليق؟ سيُحذف معه أي رد عليه.')) return;
+    const client = getClient();
+    if (!client) return;
+
+    try {
+        const { data: deleted, error } = await client.rpc('delete_comment', {
+            p_comment_id: String(commentId),
+            p_token: userToken
+        });
+        if (error) throw error;
+        if (!deleted) throw new Error('not_deleted');
+
+        showToast('تم حذف التعليق', 'success');
+        loadComments();
+        loadPostDetails();
+    } catch (err) {
+        console.error('Error deleting comment:', err);
+        showToast('تعذر حذف التعليق', 'error');
+    }
+}
+
+async function sharePost(postId) {
+    const url = `${location.origin}/p/${encodeURIComponent(postId)}`;
+    try {
+        if (navigator.share) {
+            await navigator.share({ title: 'AnonSpace', url });
+            return;
+        }
+    } catch (err) {
+        if (err && err.name === 'AbortError') return;
+    }
+    try {
+        await navigator.clipboard.writeText(url);
+        showToast('تم نسخ رابط المنشور', 'success');
+    } catch (err) {
+        prompt('انسخ الرابط:', url);
+    }
 }
 
 function toggleReplyForm(commentId) {

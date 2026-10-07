@@ -29,6 +29,16 @@ function getMyPostIds() {
 let selectedImageFile = null;
 let currentCategory = 'الكل';
 
+// حالة الخلاصة: بحث + ترتيب + تحميل المزيد
+const ONLY_MINE = window.ONLY_MINE === true; // صفحة "منشوراتي"
+const PAGE_SIZE = 20;
+let currentSearch = '';
+let currentSort = 'new';
+let loadedCount = 0;
+let hasMorePosts = false;
+let fetchSeq = 0;
+let searchTimer = null;
+
 function escapeHtml(text) {
     if (!text) return '';
     return String(text)
@@ -88,6 +98,7 @@ function filterCategory(category, btnElement) {
         }
     });
 
+    loadedCount = 0;
     fetchPosts();
 }
 
@@ -133,34 +144,152 @@ function removeSelectedImage() {
     if (container) container.classList.add('hidden');
 }
 
-async function fetchPosts() {
+async function fetchPosts(append = false) {
     const container = document.getElementById('posts-container');
     if (!container) return;
 
+    const reqId = ++fetchSeq;
+
     try {
-        const client = window.db || (typeof db !== 'undefined' ? db : null) || (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
+        const client = getClient();
         if (!client) {
             container.innerHTML = `<div class="text-center py-12 text-red-400 text-xs">خطأ في الاتصال بقاعدة البيانات. تأكد من إعدادات Supabase.</div>`;
             return;
         }
 
-        const { data: posts, error } = await client.rpc('get_posts', {
+        // عند التحديث (بعد إعجاب مثلاً) نعيد تحميل نفس عدد المنشورات المعروضة حتى لا يضيع مكانك
+        const offset = append ? loadedCount : 0;
+        const limit = append ? PAGE_SIZE : Math.min(Math.max(loadedCount, PAGE_SIZE), 100);
+
+        const { data, error } = await client.rpc('get_posts', {
             p_category: (currentCategory && currentCategory !== 'الكل') ? currentCategory : null,
-            p_token: userToken
+            p_token: userToken,
+            p_search: currentSearch || null,
+            p_sort: currentSort,
+            p_limit: limit,
+            p_offset: offset,
+            p_mine: ONLY_MINE
         });
 
         if (error) throw error;
+        if (reqId !== fetchSeq) return; // وصل رد أقدم من طلب أحدث، نتجاهله
 
-        if (!posts || posts.length === 0) {
-            container.innerHTML = `<div class="text-center py-12 text-gray-500 text-xs">لا توجد مشاركات ${currentCategory !== 'الكل' ? `في تصنيف (${escapeHtml(currentCategory)})` : ''} حالياً. كن أول من يبوح!</div>`;
-            return;
+        const posts = (data && data.posts) || [];
+        hasMorePosts = !!(data && data.has_more);
+
+        if (append) {
+            container.insertAdjacentHTML('beforeend', posts.map(post => renderPostCard(post)).join(''));
+            loadedCount += posts.length;
+        } else {
+            loadedCount = posts.length;
+            if (posts.length === 0) {
+                const msg = ONLY_MINE
+                    ? 'لم تنشر أي منشور من هذا المتصفح بعد.'
+                    : currentSearch
+                    ? `لا توجد نتائج للبحث عن "${escapeHtml(currentSearch)}"${currentCategory !== 'الكل' ? ` في تصنيف (${escapeHtml(currentCategory)})` : ''}.`
+                    : `لا توجد مشاركات ${currentCategory !== 'الكل' ? `في تصنيف (${escapeHtml(currentCategory)})` : ''} حالياً. كن أول من يبوح!`;
+                container.innerHTML = `<div class="text-center py-12 text-gray-500 text-xs">${msg}</div>`;
+            } else {
+                container.innerHTML = posts.map(post => renderPostCard(post)).join('');
+            }
         }
 
-        container.innerHTML = posts.map(post => renderPostCard(post)).join('');
+        updateLoadMoreButton();
     } catch (err) {
         console.error('Error fetching posts:', err);
-        container.innerHTML = `<div class="text-center py-12 text-red-400 text-xs">تعذر تحميل المنشورات. يرجى مراجعة Console لمعرفة الخطأ.</div>`;
+        if (!append) {
+            container.innerHTML = `<div class="text-center py-12 text-red-400 text-xs">تعذر تحميل المنشورات. يرجى مراجعة Console لمعرفة الخطأ.</div>`;
+        } else {
+            showToast('تعذر تحميل المزيد من المنشورات', 'error');
+        }
     }
+}
+
+function updateLoadMoreButton() {
+    const wrap = document.getElementById('load-more-wrap');
+    if (wrap) wrap.classList.toggle('hidden', !hasMorePosts);
+}
+
+async function loadMorePosts() {
+    const btn = document.getElementById('load-more-btn');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'جاري التحميل...';
+    }
+    await fetchPosts(true);
+    if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'عرض المزيد';
+    }
+}
+
+function updateSortButtons() {
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+        const active = btn.dataset.sort === currentSort;
+        btn.classList.toggle('bg-emerald-500', active);
+        btn.classList.toggle('text-black', active);
+        btn.classList.toggle('font-bold', active);
+        btn.classList.toggle('bg-white', !active);
+        btn.classList.toggle('text-gray-500', !active);
+        btn.classList.toggle('border', !active);
+        btn.classList.toggle('border-gray-300', !active);
+    });
+}
+
+function setSort(sort) {
+    if (sort === currentSort) return;
+    currentSort = sort;
+    loadedCount = 0;
+    updateSortButtons();
+    fetchPosts();
+}
+
+function onSearchInput(value) {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        const q = value.trim();
+        if (q === currentSearch) return;
+        currentSearch = q;
+        loadedCount = 0;
+        fetchPosts();
+    }, 400);
+}
+
+// بعد نشر منشور جديد نعيد البحث والترتيب للوضع الافتراضي ليظهر منشورك في الأعلى
+function resetFeedFilters() {
+    currentSearch = '';
+    currentSort = 'new';
+    loadedCount = 0;
+    const input = document.getElementById('search-input');
+    if (input) input.value = '';
+    updateSortButtons();
+}
+
+function initFeedControls() {
+    const input = document.getElementById('search-input');
+    if (input) {
+        input.addEventListener('input', e => onSearchInput(e.target.value));
+        input.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                clearTimeout(searchTimer);
+                const q = input.value.trim();
+                if (q !== currentSearch) {
+                    currentSearch = q;
+                    loadedCount = 0;
+                    fetchPosts();
+                }
+            }
+        });
+    }
+
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+        btn.addEventListener('click', () => setSort(btn.dataset.sort));
+    });
+
+    const moreBtn = document.getElementById('load-more-btn');
+    if (moreBtn) moreBtn.addEventListener('click', loadMorePosts);
+
+    updateSortButtons();
 }
 
 function renderPostCard(post) {
@@ -178,6 +307,7 @@ function renderPostCard(post) {
                     </span>
                     <span class="text-[10px] bg-gray-900/80 text-gray-200 border border-gray-200 px-2 py-0.5 rounded-md">${escapeHtml(post.category || 'عام')}</span>
                     <span class="text-xs text-gray-500">${timeAgoStr}</span>
+                    ${(post.reports_count || 0) >= 5 ? '<span class="text-[10px] bg-red-100 text-red-600 border border-red-200 px-2 py-0.5 rounded-md">مخفي بسبب البلاغات</span>' : ''}
                 </div>
                 
                 <div class="flex items-center gap-3">
@@ -287,6 +417,7 @@ async function submitPost() {
         if (contentInput) contentInput.value = '';
         removeSelectedImage();
         showToast('تم نشر مشاركتك بنجاح!', 'success');
+        resetFeedFilters();
         fetchPosts();
 
     } catch (err) {
@@ -406,6 +537,7 @@ function initRealtimeNotifications() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    initFeedControls();
     fetchPosts();
     initRealtimeNotifications();
     checkUnreadNotifications().then(c => { if (c !== null) lastUnreadCount = c; });
