@@ -4,7 +4,7 @@
   "description": "منصة مجهولة بالكامل للتعبير عن مشاعرك وأفكارك بدون حساب.",
   "lang": "ar",
   "dir": "rtl",
-  "start_url": "/welcome.html",
+  "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#e5e0d8",

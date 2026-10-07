@@ -109,7 +109,7 @@ async function handleReaction(postId, type) {
 
 async function loadPostDetails() {
     if (!currentPostId) {
-        window.location.href = 'index.html';
+        window.location.href = 'home.html';
         return;
     }
 

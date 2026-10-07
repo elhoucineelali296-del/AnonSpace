@@ -1,6 +1,6 @@
 const CACHE = 'anonspace-v1';
 const SHELL = [
-  '/index.html',
+  '/home.html',
   '/about.html',
   '/theme.css',
   '/icons/icon-192.png',
@@ -44,7 +44,7 @@ self.addEventListener('fetch', event => {
       .catch(() =>
         caches.match(req).then(cached => {
           if (cached) return cached;
-          if (req.mode === 'navigate') return caches.match('/index.html');
+          if (req.mode === 'navigate') return caches.match('/home.html');
           return Response.error();
         })
       )

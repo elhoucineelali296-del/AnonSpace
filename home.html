@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnonSpace - my posts</title>
+    <title>AnonSpace - Home </title>
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#DCCFC0">
     <link rel="icon" type="image/png" href="/icons/icon-192.png">
@@ -85,8 +85,8 @@
                     <span class="hidden sm:inline">عن المنصة</span>
                 </a>
 
-                <a href="home.html" class="p-2 w-9 h-9 text-gray-400 hover:text-emerald-400 transition rounded-xl bg-gray-300/60 hover:bg-gray-800/80 border border-gray-800 flex items-center justify-center" title="الرئيسية">
-                    <i class="fa-solid fa-house text-base"></i>
+                <a href="my-posts.html" class="p-2 w-9 h-9 text-gray-400 hover:text-emerald-400 transition rounded-xl bg-gray-300/60 hover:bg-gray-800/80 border border-gray-800 flex items-center justify-center" title="منشوراتي">
+                    <i class="fa-solid fa-user text-base"></i>
                 </a>
 
                 <button id="theme-toggle" type="button" class="p-2 w-9 h-9 text-gray-400 hover:text-emerald-400 transition rounded-xl bg-gray-300/60 hover:bg-gray-800/80 border border-gray-800 flex items-center justify-center" title="الوضع الليلي">
@@ -117,22 +117,67 @@
             </div>
 
         </div>
+        <p class="text-center text-red-500  text-sm">
+        </strong> <strong>ملاحظة: النسخة التجريبية
+        </p>
     </header>
 
     <main class="max-w-xl mx-auto px-4 py-6 space-y-6 relative z-10">
 
-        <div class="glass-card rounded-2xl p-5 space-y-2 shadow-xl">
-            <h1 class="text-sm font-black text-slate-800 flex items-center gap-2">
-                <i class="fa-solid fa-user text-emerald-500"></i>
-                <span>منشوراتي</span>
-            </h1>
-            <p class="text-[11px] text-gray-500 leading-relaxed">
-                المنشورات التي نشرتها من هذا المتصفح. ارتباطها بمتصفحك فقط، فإن مسحت بيانات المتصفح أو غيّرت الجهاز لن تستطيع الوصول إليها من هنا.
-            </p>
+        <div class="glass-card rounded-2xl p-5 space-y-4 shadow-xl">
+            <textarea id="post-content" rows="3" placeholder="بوح بما في خاطرك بكل حرية وبدون إظهار هويتك..." class="w-full bg-white text-slate-800 placeholder-gray-400 rounded-xl p-3 text-sm border border-gray-200 focus:outline-none focus:border-emerald-500/60 transition resize-none"></textarea>
+
+            <div id="image-preview-container" class="relative hidden rounded-xl overflow-hidden border border-gray-200 max-h-48 bg-black/50">
+                <img id="image-preview" src="" class="w-full object-cover max-h-48" alt="معاينة">
+                <button onclick="removeSelectedImage()" class="absolute top-2 left-2 bg-red-600/80 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-gray-200/60">
+                <div class="flex items-center gap-3">
+                    <select id="post-category" class=" text-black border border-gray-800 rounded-xl text-xs px-1 py-1 focus:outline-none focus:border-emerald-500">
+                        <option value="عام">عام</option>
+                        <option value="أسرار">أسرار</option>
+                        <option value="أفكار">أفكار</option>
+                        <option value="نصائح">نصائح</option>
+                        <option value="تساؤلات">تساؤلات</option>
+                    </select>
+
+                    <label class="cursor-pointer text-black hover:text-emerald-400 text-sm transition flex items-center gap-1.5 px-2 py-1.5 rounded-lg  border border-gray-800">
+                        <i class="fa-solid fa-image"></i>
+                        <span class="text-xs">صورة</span>
+                        <input type="file" id="post-image-input" accept="image/*" onchange="previewImage(event)" class="hidden">
+                    </label>
+                </div>
+
+                <button id="submit-btn" onclick="submitPost()" class="btn-shine bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold px-5 py-2 rounded-xl text-xs transition shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+                    <span>بوح الآن</span>
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </div>
         </div>
 
+        <div class="space-y-3">
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                <input id="search-input" type="search" maxlength="100" autocomplete="off" placeholder="ابحث في المنشورات..." class="w-full bg-white text-slate-800 placeholder-gray-400 rounded-xl py-2.5 pr-9 pl-3 text-xs border border-gray-300 focus:outline-none focus:border-emerald-500 transition">
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-[11px] text-gray-500">الترتيب:</span>
+                <button type="button" data-sort="new" class="sort-btn bg-emerald-500 text-black font-bold px-3.5 py-1 rounded-xl text-[11px] transition whitespace-nowrap">الأحدث</button>
+                <button type="button" data-sort="top" class="sort-btn bg-white text-gray-500 border border-gray-300 px-3.5 py-1 rounded-xl text-[11px] transition whitespace-nowrap">الأكثر إعجاباً</button>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 overflow-x-auto py-1 no-scrollbar">
+            <button onclick="filterCategory('الكل', this)" class="category-btn bg-emerald-500 text-black font-bold px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">الكل</button>
+            <button onclick="filterCategory('أسرار', this)" class="category-btn text-gray-400 hover:text-emerald-400 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">أسرار</button>
+            <button onclick="filterCategory('أفكار', this)" class="category-btn text-gray-400 hover:text-emerald-400 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">أفكار</button>
+            <button onclick="filterCategory('نصائح', this)" class="category-btn text-gray-400 hover:text-emerald-400 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">نصائح</button>
+            <button onclick="filterCategory('تساؤلات', this)" class="category-btn text-gray-400 hover:text-emerald-400 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">تساؤلات</button>
+        </div>
         <div id="posts-container" class="space-y-4">
-            <div class="text-center text-xs text-gray-500 py-8">جاري التحميل...</div>
         </div>
 
         <div id="load-more-wrap" class="hidden text-center">
@@ -145,7 +190,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
-    <script>window.ONLY_MINE = true;</script>
     <script src="js/app.js"></script>
     <script src="js/pwa.js"></script>
 </body>
