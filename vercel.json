@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/", "destination": "/welcome.html" },
     { "source": "/p/:id", "destination": "/api/og?id=:id" }
   ]
 }
