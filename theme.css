@@ -51,3 +51,19 @@ html.dark .hover\:text-emerald-400:hover { color: #34d399 !important; }
 html.dark .hover\:text-emerald-500:hover { color: #10b981 !important; }
 html.dark .hover\:text-red-400:hover { color: #f87171 !important; }
 html.dark .hover\:text-yellow-500:hover { color: #eab308 !important; }
+
+/* ---- إضافات الوضع الليلي ---- */
+html.dark [class*="DCCFC0"] { background: #161b21 !important; }
+html.dark .bg-\[\#f1f0ec\] { background: #1b2128 !important; }
+html.dark .bg-gray-100,
+html.dark .bg-gray-100\/60 { background-color: #232b34 !important; }
+html.dark .text-slate-500 { color: #9ca3af !important; }
+html.dark .text-slate-600 { color: #cbd5e1 !important; }
+html.dark .text-slate-700 { color: #e5e7eb !important; }
+html.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: #2d3640 !important; }
+html.dark .bg-emerald-50,
+html.dark .hover\:bg-emerald-50:hover { background-color: rgba(16, 185, 129, 0.12) !important; }
+html.dark .hover\:bg-gray-100:hover { background-color: #2a323b !important; }
+html.dark .text-emerald-600 { color: #34d399 !important; }
+html.dark .border-gray-300\/60 { border-color: #2d3640 !important; }
+html.dark .bg-gray-200 { background-color: #2a323b !important; }

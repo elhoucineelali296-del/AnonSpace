@@ -85,21 +85,31 @@ function formatTimeAgo(dateString) {
 
 function filterCategory(category, btnElement) {
     currentCategory = category;
-    
-    const buttons = document.querySelectorAll('.category-btn');
-    buttons.forEach(btn => {
+
+    document.querySelectorAll('.category-btn').forEach(btn => {
         const isSelected = btn === btnElement || btn.textContent.trim() === category;
-        if (isSelected) {
-            btn.classList.add('bg-emerald-500', 'text-black', 'font-bold');
-            btn.classList.remove('text-gray-400');
-        } else {
-            btn.classList.remove('bg-emerald-500', 'text-black', 'font-bold');
-            btn.classList.add('text-gray-400');
-        }
+        btn.classList.toggle('bg-emerald-500', isSelected);
+        btn.classList.toggle('text-white', isSelected);
+        btn.classList.toggle('font-bold', isSelected);
+        btn.classList.toggle('bg-white', !isSelected);
+        btn.classList.toggle('text-slate-700', !isSelected);
     });
 
     loadedCount = 0;
     fetchPosts();
+}
+
+// الضغط على وسم شائع = بحث بالكلمة
+function applyTag(tag) {
+    const word = String(tag || '').replace(/^#/, '').trim();
+    if (!word) return;
+    const input = document.getElementById('search-input');
+    if (input) input.value = word;
+    clearTimeout(searchTimer);
+    currentSearch = word;
+    loadedCount = 0;
+    fetchPosts();
+    if (input) input.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function showToast(message, type = 'info') {
@@ -227,12 +237,12 @@ function updateSortButtons() {
     document.querySelectorAll('.sort-btn').forEach(btn => {
         const active = btn.dataset.sort === currentSort;
         btn.classList.toggle('bg-emerald-500', active);
-        btn.classList.toggle('text-black', active);
+        btn.classList.toggle('text-white', active);
         btn.classList.toggle('font-bold', active);
+        btn.classList.toggle('border-emerald-500', active);
         btn.classList.toggle('bg-white', !active);
-        btn.classList.toggle('text-gray-500', !active);
-        btn.classList.toggle('border', !active);
-        btn.classList.toggle('border-gray-300', !active);
+        btn.classList.toggle('text-slate-600', !active);
+        btn.classList.toggle('border-gray-200', !active);
     });
 }
 
@@ -301,7 +311,7 @@ function renderPostCard(post) {
     return `
         <div id="post-${post.id}" class="glass-card rounded-2xl p-5 space-y-3 shadow-xl relative hover:border-emerald-500/30 transition">
             <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2 min-w-0">
                     <span class="bg-[#34d399] text-slate-900 px-2.5 py-1 rounded-full text-[10px] font-bold">
                         ${escapeHtml(post.user_badge || 'مستخدم مجهول')}
                     </span>
@@ -332,17 +342,17 @@ function renderPostCard(post) {
 
             <div class="flex items-center justify-between border-t border-gray-200/60 pt-3 text-xs">
                 <div class="flex items-center gap-4">
-                    <button onclick="reactPost('${post.id}', 'like')" class="${hasReacted === 'like' ? 'text-emerald-400 font-bold' : 'text-gray-200 hover:text-emerald-400'} flex items-center gap-1.5 transition">
+                    <button onclick="reactPost('${post.id}', 'like')" class="${hasReacted === 'like' ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-emerald-500'} flex items-center gap-1.5 transition">
                         <i class="fa-regular fa-thumbs-up"></i>
                         <span>${formatWesternNumber(post.likes_count || 0)}</span>
                     </button>
-                    <button onclick="reactPost('${post.id}', 'dislike')" class="${hasReacted === 'dislike' ? 'text-red-400 font-bold' : 'text-gray-200 hover:text-red-400'} flex items-center gap-1.5 transition">
+                    <button onclick="reactPost('${post.id}', 'dislike')" class="${hasReacted === 'dislike' ? 'text-red-400 font-bold' : 'text-slate-600 hover:text-red-500'} flex items-center gap-1.5 transition">
                         <i class="fa-regular fa-thumbs-down"></i>
                         <span>${formatWesternNumber(post.dislikes_count || 0)}</span>
                     </button>
                 </div>
 
-                <a href="post.html?id=${post.id}" class="text-emerald-400 hover:underline flex items-center gap-1.5">
+                <a href="post.html?id=${post.id}" class="text-emerald-600 hover:underline flex items-center gap-1.5">
                     <i class="fa-regular fa-comment"></i>
                     <span>${formatWesternNumber(post.comments_count || 0)} تعليق</span>
                 </a>
@@ -545,6 +555,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function toggleNotifications() {
     const dropdown = document.getElementById('notif-dropdown');
+    if (!dropdown) return;
     dropdown.classList.toggle('hidden');
     
     if (!dropdown.classList.contains('hidden')) {
@@ -576,13 +587,13 @@ async function loadNotifications() {
 
     listContainer.innerHTML = notifications.map(n => `
         <div onclick="openNotification('${n.id}', '${n.post_id || ''}')"
-             class="p-3 cursor-pointer hover:bg-gray-800/40 transition flex items-start gap-3 ${!n.is_read ? 'bg-emerald-950/20' : ''}">
+             class="p-3 cursor-pointer hover:bg-emerald-50 transition flex items-start gap-3 ${!n.is_read ? 'bg-emerald-50' : ''}">
             <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
                 <i class="fa-solid fa-heart text-xs"></i>
             </div>
             <div class="flex-1 text-right">
-                <p class="text-xs text-gray-200">${escapeHtml(n.message)}</p>
-                <span class="text-[10px] text-gray-500">${formatTimeAgo(n.created_at)}</span>
+                <p class="text-xs text-slate-800">${escapeHtml(n.message)}</p>
+                <span class="text-[10px] text-slate-500">${formatTimeAgo(n.created_at)}</span>
             </div>
         </div>
     `).join('');

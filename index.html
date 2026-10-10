@@ -10,8 +10,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#059669">
-<script src="js/supabase-config.js?v=1.1"></script>
-<link rel="stylesheet" href="theme.css?v=1.1">
 <style>
 :root {
   --primary: #10b981;
@@ -330,7 +328,7 @@ h1 span {
   <h1>أهلاً بك في <span>AnonSpace</span></h1>
 
   <p class="description">
-    منصة مجهولة بالكامل تتيح لك التعبير عن مشاعرك، أسرارك، نصائحك وتساؤلاتك بدون حساب وبكل حرية وخصوصية.
+    منصة مجهولة بالكامل تتيح لك التعبير عن مشاعرك، أسرارك، نصائحك وتساؤلاتك، والدردشة في غرف مؤقتة، بدون حساب وبكل حرية وخصوصية.
   </p>
 
   <div class="features-grid">
@@ -344,22 +342,22 @@ h1 span {
     </div>
     <div class="feature-item">
       <i class="fa-solid fa-comments"></i>
-      <span>تفاعل حقيقي</span>
+      <span>غرف دردشة</span>
     </div>
   </div>
 
   <label class="agreement-box" for="agreeCheck">
-    <input type="checkbox" id="agreeCheck" class="checkbox-input" onchange="toggleEnterButton()" checked>
+    <input type="checkbox" id="agreeCheck" class="checkbox-input" onchange="toggleEnterButton()">
     <div class="custom-checkbox">
       <i class="fa-solid fa-check"></i>
     </div>
     <div class="agreement-text">
-      أوافق على  و <a href="privacy.html">شروط الاستخدام و سياسة الخصوصية</a> الخاصة بالمنصة.
+      أوافق على <a href="privacy.html">شروط الاستخدام و سياسة الخصوصية</a> الخاصة بالمنصة.
     </div>
   </label>
 
   
-  <button id="enterBtn" onclick="enterPlatform()" class="btn-enter">
+  <button id="enterBtn" onclick="enterPlatform()" class="btn-enter" disabled>
     <span>ادخل للمنصة الآن</span>
     <i class="fa-solid fa-arrow-left"></i>
   </button>
@@ -371,6 +369,13 @@ h1 span {
 </div>
 
 <script>
+// المستخدم الذي وافق سابقاً يدخل مباشرة (أضف ?stay للبقاء في هذه الصفحة)
+try {
+  if (localStorage.getItem('anon_agreed') && location.search.indexOf('stay') === -1) {
+    location.replace('home.html');
+  }
+} catch (e) {}
+
 function toggleEnterButton() {
   const checkbox = document.getElementById('agreeCheck');
   const btn = document.getElementById('enterBtn');
@@ -378,9 +383,12 @@ function toggleEnterButton() {
 }
 
 function enterPlatform() {
+  if (!document.getElementById('agreeCheck').checked) return;
+  try { localStorage.setItem('anon_agreed', '1'); } catch (e) {}
   window.location.href = "home.html";
 }
 </script>
 
+<script src="js/pwa.js"></script>
 </body>
 </html>

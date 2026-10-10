@@ -13,15 +13,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
  
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="js/theme.js"></script>
     <script src="js/supabase-config.js?v=1.1"></script>
-    <link rel="stylesheet" href="theme.css?v=1.1">
+    <link rel="stylesheet" href="/theme.css?v=1.2">
     
 
     <style>
         body {
             font-family: 'Cairo', sans-serif;
             background-color: #e5e0d8;
-            color: #e5e7eb;
+            color: #2d3748;
             overflow-x: hidden;
             
         }
@@ -71,12 +72,12 @@
 
      <header class="sticky top-0 z-40 glass-card  bg-[#DCCFC0]">
         <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="home.html" class="flex items-center gap-2 font-black text-xl text-white">
+            <a href="home.html" class="flex items-center gap-2 font-black text-xl text-slate-800">
                 <i class="fa-solid fa-user-secret text-emerald-400"></i>
                 <span>AnonSpace</span>
             </a>
             
-            <a href="home.html" class="text-xs bg-gray-900/80 hover:bg-gray-800 text-gray-300 px-3.5 py-1.5 rounded-xl transition border border-gray-800 flex items-center gap-2">
+            <a href="home.html" class="text-xs bg-white hover:bg-gray-100 text-slate-700 px-3.5 py-1.5 rounded-xl transition border border-gray-300 flex items-center gap-2">
                 <i class="fa-solid fa-arrow-right"></i>
                 <span>العودة للرئيسية</span>
             </a>
@@ -90,9 +91,9 @@
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 mb-2">
                 <i class="fa-solid fa-mask text-3xl"></i>
             </div>
-            <h1 class="text-3xl sm:text-4xl font-black text-emerald-400">مساحتك الآمنة للبوح بكل حرية</h1>
-            <p class="text-gray-400 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
-                <strong class="text-emerald-400">AnonSpace</strong> هي منصة تفاعلية مجهولة تماماً تتيح لك مشاركة هويتك ، أسرارك، نصائحك، وتساؤلاتك ... بدون تسجيل حساب أو كشف هويتك.
+            <h1 class="text-3xl sm:text-4xl font-black text-emerald-600">مساحتك الآمنة للبوح بكل حرية</h1>
+            <p class="text-slate-600 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
+                <strong class="text-emerald-600">AnonSpace</strong> هي منصة تفاعلية مجهولة تماماً تتيح لك مشاركة هويتك ، أسرارك، نصائحك، وتساؤلاتك ... بدون تسجيل حساب أو كشف هويتك.
             </p>
         </div>
 
@@ -101,8 +102,8 @@
                 <div class="w-10 h-10 rounded-xl bg-emerald-900/40 text-emerald-400 flex items-center justify-center">
                     <i class="fa-solid fa-user-shield text-lg"></i>
                 </div>
-                <h3 class="font-bold text-emerald-400 text-base">خصوصية وهوية مجهولة</h3>
-                <p class="text-xs text-gray-900 leading-relaxed">
+                <h3 class="font-bold text-emerald-600 text-base">خصوصية وهوية مجهولة</h3>
+                <p class="text-xs text-slate-700 leading-relaxed">
                     لا نطلب منك بريداً إلكترونياً أو اسماً حقيقياً. كل مشاركة تُنسب إلى هوية مجهولة عشوائية لحماية خصوصيتك.
                 </p>
             </div>
@@ -111,8 +112,8 @@
                 <div class="w-10 h-10 rounded-xl bg-emerald-900/40 text-emerald-400 flex items-center justify-center">
                     <i class="fa-solid fa-bell text-lg"></i>
                 </div>
-                <h3 class="font-bold text-emerald-400 text-base">إشعارات تفاعلية مخصصة</h3>
-                <p class="text-xs text-gray-900 leading-relaxed">
+                <h3 class="font-bold text-emerald-600 text-base">إشعارات تفاعلية مخصصة</h3>
+                <p class="text-xs text-slate-700 leading-relaxed">
                     تلقَّ إشعارات فورية فقط عندما يتفاعل الآخرون مع مشاركاتك (إعجاب أو تعليق).
                 </p>
             </div>
@@ -121,8 +122,8 @@
                 <div class="w-10 h-10 rounded-xl bg-emerald-900/40 text-emerald-400 flex items-center justify-center">
                     <i class="fa-solid fa-layer-group text-lg"></i>
                 </div>
-                <h3 class="font-bold text-emerald-400 text-base">تصنيفات متنوعة</h3>
-                <p class="text-xs text-gray-900 leading-relaxed">
+                <h3 class="font-bold text-emerald-600 text-base">تصنيفات متنوعة</h3>
+                <p class="text-xs text-slate-700 leading-relaxed">
                     تصفح وشارك المحتوى بحسب اهتمامك عبر تصنيفات مخصصة (أسرار، نصائح، وتساؤلات ...).
                 </p>
             </div>
@@ -131,29 +132,50 @@
                 <div class="w-10 h-10 rounded-xl bg-emerald-900/40 text-emerald-400 flex items-center justify-center">
                     <i class="fa-solid fa-shield-halved text-lg"></i>
                 </div>
-                <h3 class="font-bold text-emerald-400 text-base">بيئة آمنة ونظيفة</h3>
-                <p class="text-xs text-gray-900 leading-relaxed">
+                <h3 class="font-bold text-emerald-600 text-base">بيئة آمنة ونظيفة</h3>
+                <p class="text-xs text-slate-700 leading-relaxed">
                     نعتمد على نظام الإبلاغات الذكي لحجب المحتوى المسيء تلقائياً عند تلقيه 5 إبلاغات.
+                </p>
+            </div>
+
+            <div class="glass-card p-6 rounded-2xl space-y-3 hover:border-emerald-500/40 transition">
+                <div class="w-10 h-10 rounded-xl bg-emerald-900/40 text-emerald-400 flex items-center justify-center">
+                    <i class="fa-solid fa-comments text-lg"></i>
+                </div>
+                <h3 class="font-bold text-emerald-600 text-base">غرف دردشة مؤقتة</h3>
+                <p class="text-xs text-slate-700 leading-relaxed">
+                    أنشئ غرفة بموضوعك وتحدث مع آخرين بشكل مباشر وبهوية مجهولة. تختفي الغرفة ورسائلها بعد 24 ساعة.
+                </p>
+            </div>
+
+            <div class="glass-card p-6 rounded-2xl space-y-3 hover:border-emerald-500/40 transition">
+                <div class="w-10 h-10 rounded-xl bg-emerald-900/40 text-emerald-400 flex items-center justify-center">
+                    <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                </div>
+                <h3 class="font-bold text-emerald-600 text-base">بحث وترتيب</h3>
+                <p class="text-xs text-slate-700 leading-relaxed">
+                    ابحث في المنشورات، وفرزها حسب الأحدث أو الأكثر إعجاباً، أو تصفح الوسوم الشائعة.
                 </p>
             </div>
         </div>
 
         <div class="glass-card p-6 rounded-2xl space-y-4">
-            <h2 class="font-bold text-white text-base flex items-center gap-2">
+            <h2 class="font-bold text-slate-800 text-base flex items-center gap-2">
                 <i class="fa-solid fa-scroll text-emerald-400 "></i>
                 <span class="text-emerald-400">قواعد الاستخدام</span>
             </h2>
-            <ul class="space-y-2 text-xs text-[#dc2626] list-disc list-inside leading-relaxed">
+            <ul class="space-y-2 text-xs text-slate-700 list-disc list-inside leading-relaxed">
                 <li>احترم جميع المستخدمين وتجنب الخطاب المسيء أو التنمر.</li>
                 <li>يُمنع نشر معلومات شخصية حساسة عن نفسك أو عن الآخرين.</li>
                 <li>استخدم ميزة الإبلاغ لمساعدتنا في إبقاء المنصة نظيفة وآمنة.</li>
+                <li>لا تكتب في الغرف المؤقتة أي معلومة تكشف هويتك، فرسائلها ظاهرة لكل من يدخلها.</li>
             </ul>
         </div>
 
         <div class="glass-card p-6 rounded-2xl bg-emerald-200 space-y-4">
-            <h2 class="font-bold text-white text-base text-center">قيم تجربتك للموقع</h2>
+            <h2 class="font-bold text-slate-800 text-base text-center">قيم تجربتك للموقع</h2>
 
-            <div class="flex justify-center gap-2 text-2xl text-gray-600 cursor-pointer" id="star-rating">
+            <div class="flex justify-center gap-2 text-2xl text-gray-400 cursor-pointer" id="star-rating">
                 <i class="fa-solid fa-star star transition-colors" data-value="1"></i>
                 <i class="fa-solid fa-star star transition-colors" data-value="2"></i>
                 <i class="fa-solid fa-star star transition-colors" data-value="3"></i>
@@ -161,13 +183,13 @@
                 <i class="fa-solid fa-star star transition-colors" data-value="5"></i>
             </div>
 
-            <textarea id="feedback-input" rows="3" placeholder="اكتب ملاحظاتك أو اقتراحاتك هنا (اختياري)..." class="w-full  border border-gray-800 rounded-xl p-3 text-xs text-white focus:border-emerald-500 outline-none resize-none"></textarea>
+            <textarea id="feedback-input" rows="3" placeholder="اكتب ملاحظاتك أو اقتراحاتك هنا (اختياري)..." class="w-full bg-white border border-gray-300 rounded-xl p-3 text-xs text-slate-800 focus:border-emerald-500 outline-none resize-none"></textarea>
 
             <button onclick="submitRating()" class="w-full py-2.5 bg-[#DCCFC0] text-black font-bold text-xs rounded-xl hover:bg-[#ffffff] transition">إرسال التقييم</button>
             
-            <div class="text-center pt-2 border-t border-gray-800/60 mt-4">
-                <span class="text-xs text-white block">متوسط التقييم العام</span>
-                <div class="text-xl font-bold text-white mt-1" id="average-rating">-- / 5</div>
+            <div class="text-center pt-2 border-t border-gray-300 mt-4">
+                <span class="text-xs text-slate-700 block">متوسط التقييم العام</span>
+                <div class="text-xl font-bold text-slate-800 mt-1" id="average-rating">-- / 5</div>
             </div>
         </div>
 
@@ -184,12 +206,11 @@
 
     </main>
 
-    <footer class="bg-[#DCCFC0]  glass-card py-5 text-center text-xs text-gray-500 relative z-10">
+    <footer class="bg-[#DCCFC0]  glass-card py-5 text-center text-xs text-slate-600 relative z-10">
         <p>جميع الحقوق محفوظة &copy; AnonSpace 2026</p>
         <p>مطور المنصة <strong>الحسين العلي </strong></p>
     </footer>
 
-    <script src="supabase.js"></script>
     <script>
         let selectedRating = 0;
 
@@ -224,15 +245,19 @@
                 const val = parseInt(star.getAttribute('data-value'));
                 if (val <= rating) {
                     star.classList.add('text-amber-400');
-                    star.classList.remove('text-gray-600');
+                    star.classList.remove('text-gray-400');
                 } else {
                     star.classList.remove('text-amber-400');
-                    star.classList.add('text-gray-600');
+                    star.classList.add('text-gray-400');
                 }
             });
         }
 
         async function submitRating() {
+            if (localStorage.getItem('site_rated')) {
+                alert('لقد قمت بتقييم المنصة سابقاً، شكراً لك!');
+                return;
+            }
             if (selectedRating === 0) {
                 alert('يرجى تحديد عدد النجوم قبل الإرسال');
                 return;
@@ -247,6 +272,7 @@
 
                 if (error) throw error;
 
+                localStorage.setItem('site_rated', '1');
                 alert('شكراً لك! تم إرسال تقييمك بنجاح.');
                 document.getElementById('feedback-input').value = '';
                 selectedRating = 0;
@@ -276,6 +302,6 @@
             }
         }
     </script>
-    <script src="js/supabase-config.js"></script>
+    <script src="js/pwa.js"></script>
 </body>
 </html>

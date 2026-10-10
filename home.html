@@ -2,38 +2,28 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnonSpace - Home </title>
-    <link rel="manifest" href="/manifest.webmanifest">
-    <meta name="theme-color" content="#DCCFC0">
-    <link rel="icon" type="image/png" href="/icons/icon-192.png">
-    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-    <link rel="stylesheet" href="/theme.css">
-    <script src="js/theme.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AnonSpace - Home</title>
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#059669">
-
+    <meta name="theme-color" content="#DCCFC0">
+    <script src="js/theme.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <script src="js/supabase-config.js?v=1.1"></script>
-    <link rel="stylesheet" href="theme.css?v=1.1">
-    
+    <link rel="stylesheet" href="/theme.css?v=1.2">
     <style>
         body {
             font-family: 'Cairo', sans-serif;
             background-color: #e5e0d8;
-            color: #e5e7eb;
+            color: #2d3748;
             overflow-x: hidden;
         }
-
         .bg-grid-pattern {
             background-image: radial-gradient(rgba(16, 185, 129, 0.12) 1px, transparent 1px);
             background-size: 32px 32px;
         }
-
         @keyframes blob {
             0%, 100% { transform: translate(0px, 0px) scale(1); }
             33% { transform: translate(30px, -50px) scale(1.1); }
@@ -43,14 +33,18 @@
             animation: blob 8s infinite ease-in-out;
         }
         .animation-delay-2000 { animation-delay: 2s; }
-        .animation-delay-4000 { animation-delay: 4s; }
-
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        html, body { max-width: 100%; }
+        @media (max-width: 640px) {
+            /* 16px يمنع تكبير iOS التلقائي عند التركيز على الحقول */
+            input, textarea, select { font-size: 16px !important; }
+        }
+        #chat-sheet { padding-bottom: env(safe-area-inset-bottom, 0px); }
         .glass-card {
             background: #f1f0ec;
             backdrop-filter: blur(16px);
-            
         }
-
         .btn-shine {
             position: relative;
             overflow: hidden;
@@ -71,130 +65,262 @@
 </head>
 <body class="min-h-screen bg-grid-pattern relative selection:bg-emerald-500 selection:text-black">
 
-    <div class="fixed top-1/4 -right-20 w-96 h-96 bg-emerald-100/15 rounded-full blur-3xl animate-blob pointer-events-none"></div>
-    <div class="fixed bottom-1/4 -left-20 w-96 h-96 bg-teal-100/15 rounded-full blur-3xl animate-blob animation-delay-2000 pointer-events-none"></div>
-
-    <header class="sticky top-0 z-40 glass-card bg-[#DCCFC0]">
+    <header class="sticky top-0 z-40 glass-card bg-[#DCCFC0]/90 border-b border-gray-300">
         <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="home.html" class="flex items-center gap-2 font-black text-xl text-white">
-                <div class="w-8 h-8 rounded-lg bg-emerald-500 text-black flex items-center justify-center font-bold shadow-md shadow-emerald-500/20">
+            <a href="home.html" class="flex items-center gap-2 font-black text-xl text-slate-800">
+                <div class="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-500/20">
                     <i class="fa-solid fa-user-secret text-white"></i>
                 </div>
                 <span>AnonSpace</span>
             </a>
             
             <div class="flex items-center gap-2">
-                <a href="about.html" class="text-xs text-gray-400 hover:text-emerald-400 transition flex items-center gap-1.5 bg-white hover:bg-gray-800/80 px-3 py-1.5 rounded-xl border border-gray-800" title="عن المنصة">
-                    <i class="fa-solid fa-circle-info text-emerald-300"></i>
+                <a href="about.html" class="text-xs text-slate-700 hover:text-emerald-600 transition flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-gray-300" title="عن المنصة">
+                    <i class="fa-solid fa-circle-info text-emerald-500"></i>
                     <span class="hidden sm:inline">عن المنصة</span>
                 </a>
 
-                <a href="my-posts.html" class="p-2 w-9 h-9 text-gray-400 hover:text-emerald-400 transition rounded-xl bg-gray-300/60 hover:bg-gray-800/80 border border-gray-800 flex items-center justify-center" title="منشوراتي">
+                <a href="my-posts.html" class="p-2 w-9 h-9 text-slate-700 hover:text-emerald-600 transition rounded-xl bg-white border border-gray-300 flex items-center justify-center" title="منشوراتي">
                     <i class="fa-solid fa-user text-base"></i>
                 </a>
 
-                <button id="theme-toggle" type="button" class="p-2 w-9 h-9 text-gray-400 hover:text-emerald-400 transition rounded-xl bg-gray-300/60 hover:bg-gray-800/80 border border-gray-800 flex items-center justify-center" title="الوضع الليلي">
+                <button id="theme-toggle" type="button" class="p-2 w-9 h-9 text-slate-700 hover:text-emerald-600 transition rounded-xl bg-white border border-gray-300 flex items-center justify-center" title="الوضع الليلي">
                     <i class="fa-solid fa-moon text-base"></i>
                 </button>
 
                 <div class="relative">
-                    <button id="notif-btn" onclick="toggleNotifications()" class="relative p-2 text-gray-400 hover:text-emerald-400 transition rounded-xl bg-gray-300/60 hover:bg-gray-800/80 border border-gray-800 flex items-center justify-center">
+                    <button id="notif-btn" onclick="toggleNotifications()" class="relative p-2 text-slate-700 hover:text-emerald-600 transition rounded-xl bg-white border border-gray-300 flex items-center justify-center">
                         <i class="fa-solid fa-bell text-base"></i>
                         <span id="notif-badge" class="hidden absolute -top-1 -right-1 bg-emerald-500 text-black text-[10px] font-black rounded-full h-4 w-4 flex items-center justify-center shadow-md shadow-emerald-500/50">
                             0
                         </span>
                     </button>
 
-                    <div id="notif-dropdown" class="hidden absolute left-0 mt-3 w-80 glass-card rounded-2xl shadow-2xl  z-50 overflow-hidden">
-                        <div class="p-3  flex items-center justify-between bg-gray-900/40">
-                            <span class="font-bold text-xs text-white flex items-center gap-2">
-                                <i class="fa-solid fa-bell text-emerald-400"></i> الإشعارات
+                    <div id="notif-dropdown" class="hidden absolute left-0 mt-3 w-[min(20rem,calc(100vw-2rem))] glass-card rounded-2xl shadow-2xl z-50 overflow-hidden border border-gray-300">
+                        <div class="p-3 flex items-center justify-between bg-gray-100 border-b border-gray-200">
+                            <span class="font-bold text-xs text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-bell text-emerald-500"></i> الإشعارات
                             </span>
-                            <button onclick="markAllAsRead()" class="text-[11px] text-white hover:underline">تحديد الكل كمعاين</button>
+                            <button onclick="markAllAsRead()" class="text-[11px] text-emerald-600 hover:underline">تحديد الكل كمعاين</button>
                         </div>
 
-                        <div id="notif-list" class="max-h-72 overflow-y-auto divide-y divide-gray-600/40 bg-gray-900/40">
-                            <div class="p-4 text-center text-black text-xs text-gray-500">لا توجد إشعارات جديدة</div>
+                        <div id="notif-list" class="max-h-72 overflow-y-auto divide-y divide-gray-200 bg-white">
+                            <div class="p-4 text-center text-slate-500 text-xs">لا توجد إشعارات جديدة</div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
-        <p class="text-center text-red-500  text-sm">
-        </strong> <strong>ملاحظة: النسخة التجريبية
-        </p>
     </header>
 
-    <main class="max-w-xl mx-auto px-4 py-6 space-y-6 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 py-6 flex justify-center items-start gap-6 relative z-10">
+        <aside class="hidden lg:block w-[260px] shrink-0 space-y-4 sticky top-20">
+            <div class="apk-card glass-card rounded-2xl p-4 shadow-md border border-gray-300">
+                <h3 class="font-bold text-sm text-slate-800 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-mobile-screen-button text-emerald-500"></i> تطبيق المنصة
+                </h3>
+                <p class="text-xs text-slate-600 mb-3">حمّل تطبيق أندرويد لتصفح أسرع وأسهل.</p>
+                <a href="/anonspace.apk" download class="block text-center bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs py-2 px-3 rounded-xl transition shadow">تحميل APK</a>
+            </div>
+            <div class="glass-card rounded-2xl p-4 shadow-md border border-gray-300">
+                <h3 class="font-bold text-sm text-slate-800 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-line text-emerald-500"></i> إحصائيات سريعة
+                </h3>
+                <p class="text-xs text-slate-600 my-1">🟢 متواجدون الآن: <strong class="online-count">--</strong></p>
+                <p class="text-xs text-slate-600 my-1">💬 غرف نشطة: <strong class="rooms-count">--</strong></p>
+            </div>
+        </aside>
 
-        <div class="glass-card rounded-2xl p-5 space-y-4 shadow-xl">
-            <textarea id="post-content" rows="3" placeholder="بوح بما في خاطرك بكل حرية وبدون إظهار هويتك..." class="w-full bg-white text-slate-800 placeholder-gray-400 rounded-xl p-3 text-sm border border-gray-200 focus:outline-none focus:border-emerald-500/60 transition resize-none"></textarea>
+        <main class="w-full max-w-xl space-y-6">
+            <div class="glass-card rounded-2xl p-5 space-y-4 shadow-xl border border-gray-300">
+                <textarea id="post-content" rows="3" placeholder="بوح بما في خاطرك بكل حرية وبدون إظهار هويتك..." class="w-full bg-white text-slate-800 placeholder-gray-400 rounded-xl p-3 text-sm border border-gray-200 focus:outline-none focus:border-emerald-500 transition resize-none"></textarea>
 
-            <div id="image-preview-container" class="relative hidden rounded-xl overflow-hidden border border-gray-200 max-h-48 bg-black/50">
-                <img id="image-preview" src="" class="w-full object-cover max-h-48" alt="معاينة">
-                <button onclick="removeSelectedImage()" class="absolute top-2 left-2 bg-red-600/80 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs transition">
+                <div id="image-preview-container" class="relative hidden rounded-xl overflow-hidden border border-gray-200 max-h-48 bg-black/50">
+                    <img id="image-preview" src="" class="w-full object-cover max-h-48" alt="معاينة">
+                    <button onclick="removeSelectedImage()" class="absolute top-2 left-2 bg-red-600/80 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-200">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <select id="post-category" class="bg-white text-slate-800 border border-gray-300 rounded-xl text-xs px-2 py-1.5 focus:outline-none focus:border-emerald-500">
+                            <option value="عام">عام</option>
+                            <option value="أسرار">أسرار</option>
+                            <option value="أفكار">أفكار</option>
+                            <option value="نصائح">نصائح</option>
+                            <option value="تساؤلات">تساؤلات</option>
+                        </select>
+
+                        <label class="cursor-pointer text-slate-700 hover:text-emerald-600 text-sm transition flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-gray-300">
+                            <i class="fa-solid fa-image"></i>
+                            <span class="text-xs font-semibold">صورة</span>
+                            <input type="file" id="post-image-input" accept="image/*" onchange="previewImage(event)" class="hidden">
+                        </label>
+                    </div>
+
+                    <button id="submit-btn" onclick="submitPost()" class="btn-shine bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold px-5 py-2 rounded-xl text-xs transition shadow-lg shadow-emerald-500/20 flex items-center gap-2">
+                        <span>بوح الآن</span>
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ===== أقسام الشريطين الجانبيين للجوال ===== -->
+            <div class="lg:hidden space-y-3">
+                <div class="apk-card glass-card rounded-2xl p-4 shadow-md border border-gray-300">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="min-w-0">
+                            <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-mobile-screen-button text-emerald-500"></i> تطبيق المنصة
+                            </h3>
+                            <p class="text-[11px] text-slate-600 mt-1">تصفح أسرع وأسهل من شاشتك الرئيسية.</p>
+                        </div>
+                        <div class="flex flex-col gap-1.5 shrink-0">
+                            <a href="/anonspace.apk" download class="apk-link text-center bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-[11px] py-1.5 px-3 rounded-xl transition shadow">تحميل APK</a>
+                            <button type="button" class="pwa-install-btn hidden bg-white text-slate-700 border border-gray-300 font-bold text-[11px] py-1.5 px-3 rounded-xl transition">تثبيت التطبيق</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-3 shadow-md border border-gray-300 flex items-center justify-around text-xs text-slate-600">
+                    <span>🟢 متواجدون الآن: <strong class="online-count text-slate-800">--</strong></span>
+                    <span>💬 غرف نشطة: <strong class="rooms-count text-slate-800">--</strong></span>
+                </div>
+
+                <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+                    <span class="text-[11px] font-bold text-slate-600 shrink-0"><i class="fa-solid fa-fire text-emerald-500"></i> الأكثر تداولاً:</span>
+                    <button type="button" onclick="applyTag('أسرار')" class="shrink-0 bg-white text-slate-700 border border-gray-200 px-2.5 py-1 rounded-lg text-xs font-semibold">#أسرار</button>
+                    <button type="button" onclick="applyTag('فضفضة')" class="shrink-0 bg-white text-slate-700 border border-gray-200 px-2.5 py-1 rounded-lg text-xs font-semibold">#فضفضة</button>
+                    <button type="button" onclick="applyTag('نصائح')" class="shrink-0 bg-white text-slate-700 border border-gray-200 px-2.5 py-1 rounded-lg text-xs font-semibold">#نصائح</button>
+                    <button type="button" onclick="applyTag('تساؤلات')" class="shrink-0 bg-white text-slate-700 border border-gray-200 px-2.5 py-1 rounded-lg text-xs font-semibold">#تساؤلات</button>
+                </div>
+
+                <p class="text-[11px] text-slate-600 text-center leading-relaxed px-2">
+                    <i class="fa-solid fa-shield-halved text-emerald-500"></i>
+                    تفاعل بحرية تامة، هويتك مجهولة بالكامل بدون أي سجلات تتبع.
+                </p>
+            </div>
+
+            <div class="lg:hidden glass-card rounded-2xl p-4 shadow-md border border-gray-300">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-comments text-emerald-500"></i> الغرف المؤقتة
+                        <span class="text-[10px] font-normal text-slate-500">(<span class="online-count">--</span> متصل)</span>
+                    </h3>
+                    <button type="button" onclick="openCreateRoomModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg transition shadow">+ إنشاء</button>
+                </div>
+                <div class="rooms-list space-y-2 max-h-40 overflow-y-auto">
+                    <div class="text-center text-xs text-slate-500 py-3">جاري تحميل الغرف...</div>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+                    <input id="search-input" type="search" maxlength="100" autocomplete="off" placeholder="ابحث في المنشورات..." class="w-full bg-white text-slate-800 placeholder-gray-400 rounded-xl py-2.5 pr-9 pl-3 text-xs border border-gray-300 focus:outline-none focus:border-emerald-500 transition shadow-sm">
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-[11px] text-slate-600 font-bold">الترتيب:</span>
+                    <button type="button" data-sort="new" class="sort-btn bg-emerald-500 text-white font-bold border border-emerald-500 px-3.5 py-1 rounded-xl text-[11px] transition whitespace-nowrap shadow-sm">الأحدث</button>
+                    <button type="button" data-sort="top" class="sort-btn bg-white text-slate-600 border border-gray-200 px-3.5 py-1 rounded-xl text-[11px] transition whitespace-nowrap shadow-sm">الأكثر إعجاباً</button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 overflow-x-auto py-1 no-scrollbar">
+                <button onclick="filterCategory('الكل', this)" class="category-btn bg-emerald-500 text-white font-bold px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap shadow-sm">الكل</button>
+                <button onclick="filterCategory('أسرار', this)" class="category-btn bg-white text-slate-700 hover:text-emerald-600 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap border border-gray-300">أسرار</button>
+                <button onclick="filterCategory('أفكار', this)" class="category-btn bg-white text-slate-700 hover:text-emerald-600 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap border border-gray-300">أفكار</button>
+                <button onclick="filterCategory('نصائح', this)" class="category-btn bg-white text-slate-700 hover:text-emerald-600 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap border border-gray-300">نصائح</button>
+                <button onclick="filterCategory('تساؤلات', this)" class="category-btn bg-white text-slate-700 hover:text-emerald-600 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap border border-gray-300">تساؤلات</button>
+            </div>
+
+            <div id="posts-container" class="space-y-4"></div>
+
+            <div id="load-more-wrap" class="hidden text-center">
+                <button id="load-more-btn" type="button" class="btn-shine bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold px-6 py-2 rounded-xl text-xs transition shadow-lg shadow-emerald-500/20">عرض المزيد</button>
+            </div>
+        </main>
+
+        <aside class="hidden lg:block w-[260px] shrink-0 space-y-4 sticky top-20">
+            <div class="glass-card rounded-2xl p-4 shadow-md border border-gray-300">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-comments text-emerald-500"></i> الغرف المؤقتة
+                    </h3>
+                    <button onclick="openCreateRoomModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg transition shadow">
+                        + إنشاء
+                    </button>
+                </div>
+                <p class="text-[11px] text-slate-600 mb-3">تختفي الغرفة بعد 24 ساعة تلقائياً.</p>
+                <div class="rooms-list space-y-2 max-h-64 overflow-y-auto">
+                    <div class="text-center text-xs text-slate-500 py-3">جاري تحميل الغرف...</div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-4 shadow-md border border-gray-300">
+                <h3 class="font-bold text-sm text-slate-800 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-fire text-emerald-500"></i> الوسوم الشائعة
+                </h3>
+                <div class="flex flex-wrap gap-1.5">
+                    <button type="button" onclick="applyTag('أسرار')" class="bg-white text-slate-700 border border-gray-200 px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer hover:bg-emerald-50 transition">#أسرار</button>
+                    <button type="button" onclick="applyTag('فضفضة')" class="bg-white text-slate-700 border border-gray-200 px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer hover:bg-emerald-50 transition">#فضفضة</button>
+                    <button type="button" onclick="applyTag('نصائح')" class="bg-white text-slate-700 border border-gray-200 px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer hover:bg-emerald-50 transition">#نصائح</button>
+                    <button type="button" onclick="applyTag('تساؤلات')" class="bg-white text-slate-700 border border-gray-200 px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer hover:bg-emerald-50 transition">#تساؤلات</button>
+                </div>
+            </div>
+            <div class="glass-card rounded-2xl p-4 shadow-md border border-gray-300">
+                <h3 class="font-bold text-sm text-slate-800 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-shield-halved text-emerald-500"></i> مساحتك الآمنة
+                </h3>
+                <p class="text-xs text-slate-600 leading-relaxed">تفاعل بحرية تامة، هويتك مشفرة ومجهولة بالكامل بدون أي سجلات تتبع.</p>
+            </div>
+        </aside>
+    </div>
+
+    <div id="create-room-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="glass-card bg-[#f1f0ec] rounded-2xl p-5 w-full max-w-md shadow-2xl border border-gray-300 space-y-4">
+            <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-plus-circle text-emerald-500"></i> إنشاء غرفة محادثة جديدة
+            </h3>
+            <input type="text" id="room-title-input" maxlength="60" placeholder="اسم أو موضوع الغرفة (مثلاً: فضفضة ليلية)..." class="w-full bg-white text-slate-800 placeholder-gray-400 rounded-xl p-3 text-xs border border-gray-200 focus:outline-none focus:border-emerald-500">
+            <div class="flex items-center justify-end gap-2 pt-2">
+                <button onclick="closeCreateRoomModal()" class="bg-gray-200 hover:bg-gray-300 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition">إلغاء</button>
+                <button id="create-room-btn" onclick="createRoom()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow">إنشاء ودخول</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="chat-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-stretch sm:items-center justify-center sm:p-4">
+        <div id="chat-sheet" class="glass-card w-full sm:max-w-md h-[100dvh] sm:h-[600px] sm:max-h-[90vh] rounded-none sm:rounded-2xl shadow-2xl sm:border border-gray-300 flex flex-col overflow-hidden">
+            <div class="flex items-center justify-between gap-2 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] border-b border-gray-200 bg-gray-100 shrink-0">
+                <div class="min-w-0">
+                    <h3 id="chat-title" class="font-bold text-sm text-slate-800 truncate"></h3>
+                    <span class="text-[10px] text-slate-500"><i class="fa-solid fa-circle text-emerald-500 text-[7px]"></i> <span id="chat-online">1</span> متصل الآن · تختفي الغرفة بعد 24 ساعة</span>
+                </div>
+                <button type="button" onclick="closeChat()" class="w-8 h-8 rounded-xl bg-white border border-gray-300 text-slate-700 hover:text-red-500 flex items-center justify-center shrink-0" title="خروج">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-
-            <div class="flex items-center justify-between pt-2 border-t border-gray-200/60">
-                <div class="flex items-center gap-3">
-                    <select id="post-category" class=" text-black border border-gray-800 rounded-xl text-xs px-1 py-1 focus:outline-none focus:border-emerald-500">
-                        <option value="عام">عام</option>
-                        <option value="أسرار">أسرار</option>
-                        <option value="أفكار">أفكار</option>
-                        <option value="نصائح">نصائح</option>
-                        <option value="تساؤلات">تساؤلات</option>
-                    </select>
-
-                    <label class="cursor-pointer text-black hover:text-emerald-400 text-sm transition flex items-center gap-1.5 px-2 py-1.5 rounded-lg  border border-gray-800">
-                        <i class="fa-solid fa-image"></i>
-                        <span class="text-xs">صورة</span>
-                        <input type="file" id="post-image-input" accept="image/*" onchange="previewImage(event)" class="hidden">
-                    </label>
-                </div>
-
-                <button id="submit-btn" onclick="submitPost()" class="btn-shine bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold px-5 py-2 rounded-xl text-xs transition shadow-lg shadow-emerald-500/20 flex items-center gap-2">
-                    <span>بوح الآن</span>
+            <div id="chat-messages" class="flex-1 min-h-0 overflow-y-auto overscroll-contain p-3 space-y-2"></div>
+            <div class="p-3 border-t border-gray-200 flex items-center gap-2 shrink-0">
+                <input id="chat-input" type="text" maxlength="500" autocomplete="off" placeholder="اكتب رسالة..." class="flex-1 min-w-0 bg-white text-slate-800 placeholder-gray-400 rounded-xl p-3 text-sm border border-gray-300 focus:outline-none focus:border-emerald-500">
+                <button type="button" onclick="sendChatMessage()" class="bg-emerald-500 hover:bg-emerald-600 text-white w-11 h-11 rounded-xl flex items-center justify-center transition shadow shrink-0" title="إرسال">
                     <i class="fa-solid fa-paper-plane text-xs"></i>
                 </button>
             </div>
         </div>
-
-        <div class="space-y-3">
-            <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
-                <input id="search-input" type="search" maxlength="100" autocomplete="off" placeholder="ابحث في المنشورات..." class="w-full bg-white text-slate-800 placeholder-gray-400 rounded-xl py-2.5 pr-9 pl-3 text-xs border border-gray-300 focus:outline-none focus:border-emerald-500 transition">
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="text-[11px] text-gray-500">الترتيب:</span>
-                <button type="button" data-sort="new" class="sort-btn bg-emerald-500 text-black font-bold px-3.5 py-1 rounded-xl text-[11px] transition whitespace-nowrap">الأحدث</button>
-                <button type="button" data-sort="top" class="sort-btn bg-white text-gray-500 border border-gray-300 px-3.5 py-1 rounded-xl text-[11px] transition whitespace-nowrap">الأكثر إعجاباً</button>
-            </div>
-        </div>
-
-        <div class="flex items-center gap-2 overflow-x-auto py-1 no-scrollbar">
-            <button onclick="filterCategory('الكل', this)" class="category-btn bg-emerald-500 text-black font-bold px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">الكل</button>
-            <button onclick="filterCategory('أسرار', this)" class="category-btn text-gray-400 hover:text-emerald-400 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">أسرار</button>
-            <button onclick="filterCategory('أفكار', this)" class="category-btn text-gray-400 hover:text-emerald-400 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">أفكار</button>
-            <button onclick="filterCategory('نصائح', this)" class="category-btn text-gray-400 hover:text-emerald-400 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">نصائح</button>
-            <button onclick="filterCategory('تساؤلات', this)" class="category-btn text-gray-400 hover:text-emerald-400 px-4 py-1.5 rounded-xl text-xs transition whitespace-nowrap">تساؤلات</button>
-        </div>
-        <div id="posts-container" class="space-y-4">
-        </div>
-
-        <div id="load-more-wrap" class="hidden text-center">
-            <button id="load-more-btn" type="button" class="btn-shine bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold px-6 py-2 rounded-xl text-xs transition shadow-lg shadow-emerald-500/20">عرض المزيد</button>
-        </div>
-
-    </main>
+    </div>
 
     <div id="toast-container" class="fixed bottom-5 left-5 z-50 space-y-2"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase-config.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/chat.js"></script>
     <script src="js/pwa.js"></script>
+    <script>
+        if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
+            document.querySelectorAll('.apk-link').forEach(function (a) { a.classList.add('hidden'); });
+        }
+    </script>
 </body>
 </html>

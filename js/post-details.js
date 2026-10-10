@@ -132,7 +132,7 @@ async function loadPostDetails() {
 
     container.innerHTML = `
         <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2 min-w-0">
                 <span class="bg-[#34d399] text-slate-900 px-2.5 py-1 rounded-full text-[10px] font-bold">
                     ${escapeHtml(post.user_badge || 'مستخدم مجهول')}
                 </span>

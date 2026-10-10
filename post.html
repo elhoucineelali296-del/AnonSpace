@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AnonSpace - post</title>
-    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#DCCFC0">
     <link rel="icon" type="image/png" href="/icons/icon-192.png">
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-    <link rel="stylesheet" href="/theme.css">
     <script src="js/theme.js"></script>
    
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,17 +15,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#059669">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
     <script src="js/supabase-config.js?v=1.1"></script>
-    <link rel="stylesheet" href="theme.css?v=1.1">
+    <link rel="stylesheet" href="/theme.css?v=1.2">
     
 
     <style>
         body {
             font-family: 'Cairo', sans-serif;
             background-color: #e5e0d8;
-            color: #e5e7eb;
+            color: #2d3748;
             overflow-x: hidden;
         }
 
@@ -73,13 +71,13 @@
   
     <header class="sticky top-0 z-40 glass-card  bg-[#DCCFC0]">
         <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="home.html" class="flex items-center gap-2 font-black text-xl text-white">
+            <a href="home.html" class="flex items-center gap-2 font-black text-xl text-slate-800">
                 <i class="fa-solid fa-user-secret text-emerald-400"></i>
                 <span>AnonSpace</span>
             </a>
             
             <div class="flex items-center gap-2">
-                <a href="home.html" class="text-xs bg-gray-900/80 hover:bg-gray-800 text-gray-300 px-3.5 py-1.5 rounded-xl transition border border-gray-800 flex items-center gap-2">
+                <a href="home.html" class="text-xs bg-white hover:bg-gray-100 text-slate-700 px-3.5 py-1.5 rounded-xl transition border border-gray-300 flex items-center gap-2">
                     <i class="fa-solid fa-arrow-right"></i>
                     <span>العودة للرئيسية</span>
                 </a>
@@ -125,8 +123,6 @@
 
     <div id="toast-container" class="fixed bottom-5 left-5 z-50 space-y-2"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase-config.js"></script>
     <script src="js/post-details.js"></script>
     <script src="js/pwa.js"></script>
 </body>

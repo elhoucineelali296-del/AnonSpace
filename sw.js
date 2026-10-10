@@ -1,8 +1,13 @@
-const CACHE = 'anonspace-v1';
+const CACHE = 'anonspace-v2';
 const SHELL = [
+  '/',
+  '/index.html',
   '/home.html',
   '/about.html',
   '/theme.css',
+  '/js/app.js',
+  '/js/chat.js',
+  '/js/theme.js',
   '/icons/icon-192.png',
   '/icons/icon-512.png'
 ];
@@ -10,7 +15,8 @@ const SHELL = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE)
-      .then(cache => cache.addAll(SHELL).catch(() => {}))
+      // نضيف كل ملف على حدة حتى لا يفشل التثبيت كله إن غاب ملف واحد
+      .then(cache => Promise.all(SHELL.map(u => cache.add(u).catch(() => {}))))
       .then(() => self.skipWaiting())
   );
 });
@@ -28,9 +34,9 @@ self.addEventListener('fetch', event => {
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
-  
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/p/')) return;
+  if (url.pathname.endsWith('.apk')) return;
 
   event.respondWith(
     fetch(req)
