@@ -1,4 +1,3 @@
-/* AnonSpace - الغرف المؤقتة (دردشة مجهولة) + عدّاد المتواجدين */
 (function () {
     'use strict';
 
@@ -25,7 +24,6 @@
             .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
-    // هوية الدردشة: هاش من التوكن (لا نرسل التوكن الحقيقي أبداً لأنه يمنح صلاحية الحذف)
     async function sha256Hex(text) {
         if (window.crypto && crypto.subtle) {
             const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
@@ -59,7 +57,7 @@
         document.querySelectorAll(selector).forEach(el => { el.innerHTML = html; });
     }
 
-    /* ---------------- قائمة الغرف ---------------- */
+  
     async function fetchChatRooms() {
         const c = client();
         if (!c) {
@@ -98,7 +96,7 @@
         }
     }
 
-    /* ---------------- إنشاء غرفة ---------------- */
+
     function openCreateRoomModal() {
         $('create-room-modal').classList.remove('hidden');
         setTimeout(() => $('room-title-input') && $('room-title-input').focus(), 50);
@@ -139,7 +137,6 @@
         }
     }
 
-    /* ---------------- نافذة الدردشة ---------------- */
     function bubble(m) {
         const mine = m.sender_hash === myHash;
         const t = new Date(m.created_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
@@ -214,7 +211,6 @@
             .subscribe(status => {
                 if (status === 'SUBSCRIBED') roomChannel.track({ at: Date.now() });
             });
-        // احتياط: لو لم يكن Realtime مفعّلاً على الجدول نجلب الجديد كل 5 ثوانٍ
         pollTimer = setInterval(pollMessages, 5000);
     }
 
@@ -252,7 +248,6 @@
         }
     }
 
-    // على الجوال: اجعل نافذة الدردشة بارتفاع المساحة المرئية فوق لوحة المفاتيح
     function fitToViewport() {
         const sheet = $('chat-sheet');
         const vv = window.visualViewport;
@@ -307,7 +302,6 @@
         }
     }
 
-    /* ---------------- عدّاد المتواجدين الحقيقي ---------------- */
     async function initPresence() {
         const c = client();
         if (!c) return;
@@ -321,7 +315,7 @@
         });
     }
 
-    /* ---------------- تهيئة ---------------- */
+  
     window.openCreateRoomModal = openCreateRoomModal;
     window.closeCreateRoomModal = closeCreateRoomModal;
     window.createRoom = createRoom;

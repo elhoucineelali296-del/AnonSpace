@@ -29,8 +29,8 @@ function getMyPostIds() {
 let selectedImageFile = null;
 let currentCategory = 'الكل';
 
-// حالة الخلاصة: بحث + ترتيب + تحميل المزيد
-const ONLY_MINE = window.ONLY_MINE === true; // صفحة "منشوراتي"
+
+const ONLY_MINE = window.ONLY_MINE === true; 
 const PAGE_SIZE = 20;
 let currentSearch = '';
 let currentSort = 'new';
@@ -99,7 +99,6 @@ function filterCategory(category, btnElement) {
     fetchPosts();
 }
 
-// الضغط على وسم شائع = بحث بالكلمة
 function applyTag(tag) {
     const word = String(tag || '').replace(/^#/, '').trim();
     if (!word) return;
@@ -167,7 +166,6 @@ async function fetchPosts(append = false) {
             return;
         }
 
-        // عند التحديث (بعد إعجاب مثلاً) نعيد تحميل نفس عدد المنشورات المعروضة حتى لا يضيع مكانك
         const offset = append ? loadedCount : 0;
         const limit = append ? PAGE_SIZE : Math.min(Math.max(loadedCount, PAGE_SIZE), 100);
 
@@ -182,8 +180,7 @@ async function fetchPosts(append = false) {
         });
 
         if (error) throw error;
-        if (reqId !== fetchSeq) return; // وصل رد أقدم من طلب أحدث، نتجاهله
-
+        if (reqId !== fetchSeq) return; 
         const posts = (data && data.posts) || [];
         hasMorePosts = !!(data && data.has_more);
 
@@ -265,7 +262,6 @@ function onSearchInput(value) {
     }, 400);
 }
 
-// بعد نشر منشور جديد نعيد البحث والترتيب للوضع الافتراضي ليظهر منشورك في الأعلى
 function resetFeedFilters() {
     currentSearch = '';
     currentSort = 'new';
@@ -530,8 +526,7 @@ async function reportPost(postId) {
 let lastUnreadCount = null;
 
 function initRealtimeNotifications() {
-    // Realtime مباشر على جدول notifications لم يعد ممكناً بعد تفعيل RLS،
-    // لذلك نفحص الإشعارات كل 20 ثانية عبر دالة آمنة.
+  
     setInterval(async () => {
         if (document.hidden) return;
         const count = await checkUnreadNotifications();

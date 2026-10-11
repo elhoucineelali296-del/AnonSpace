@@ -15,7 +15,6 @@ const SHELL = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE)
-      // نضيف كل ملف على حدة حتى لا يفشل التثبيت كله إن غاب ملف واحد
       .then(cache => Promise.all(SHELL.map(u => cache.add(u).catch(() => {}))))
       .then(() => self.skipWaiting())
   );
