@@ -1,5 +1,37 @@
+
 {
   "rewrites": [
-    { "source": "/p/:id", "destination": "/api/og?id=:id" }
+    {
+      "source": "/p/:id",
+      "destination": "/api/og?id=:id"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/.well-known/assetlinks.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
+    },
+    {
+      "source": "/anonspace.apk",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/vnd.android.package-archive"
+        },
+        {
+          "key": "Content-Disposition",
+          "value": "attachment; filename=anonspace.apk"
+        }
+      ]
+    }
   ]
 }

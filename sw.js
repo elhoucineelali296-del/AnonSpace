@@ -1,4 +1,4 @@
-const CACHE = 'anonspace-v2';
+const CACHE = 'anonspace-v4';
 const SHELL = [
   '/',
   '/index.html',

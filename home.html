@@ -7,6 +7,22 @@
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#DCCFC0">
     <script src="js/theme.js"></script>
+    <script>
+        // هل الصفحة مفتوحة من داخل التطبيق (مثبّت PWA / TWA / WebView)؟ نخفي بطاقة التحميل حينها
+        (function () {
+            var inApp = false;
+            try {
+                var mm = function (q) { return window.matchMedia && window.matchMedia(q).matches; };
+                inApp = mm('(display-mode: standalone)') || mm('(display-mode: fullscreen)') ||
+                        mm('(display-mode: minimal-ui)') || window.navigator.standalone === true ||
+                        (document.referrer || '').indexOf('android-app://') === 0 ||
+                        /; wv\)/.test(navigator.userAgent) ||
+                        /[?&]source=(pwa|app)\b/.test(location.search);
+            } catch (e) {}
+            if (inApp) document.documentElement.classList.add('in-app');
+        })();
+    </script>
+    <style>html.in-app .apk-card { display: none !important; }</style>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
@@ -240,6 +256,9 @@
             <div id="load-more-wrap" class="hidden text-center">
                 <button id="load-more-btn" type="button" class="btn-shine bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold px-6 py-2 rounded-xl text-xs transition shadow-lg shadow-emerald-500/20">عرض المزيد</button>
             </div>
+            <p class="text-center text-[11px] text-slate-500 pb-4">
+                باستخدامك المنصة فأنت توافق على <a href="privacy.html" class="text-emerald-600 underline font-bold">شروط الاستخدام وسياسة الخصوصية</a>
+            </p>
         </main>
 
         <aside class="hidden lg:block w-[260px] shrink-0 space-y-4 sticky top-20">
